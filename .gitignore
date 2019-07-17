@@ -1,0 +1,5 @@
+/proMAD.egg-info/
+/dist/
+/build/
+/.coverage
+/coverage_html_report/

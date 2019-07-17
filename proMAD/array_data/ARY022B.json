@@ -1,0 +1,1246 @@
+{
+    "name": "Human XL Cytokine Array Kit",
+    "array_type": "Proteome Profiler Array",
+    "company": "R&D Systems, Inc",
+    "source": "https://resources.rndsystems.com/pdfs/datasheets/ary022b.pdf",
+    "created": "2018-06-09T09:10:59.752584",
+    "id": "ARY022B",
+    "net_skip_size": 0.6666666666666666,
+    "net_layout_x": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+    ],
+    "net_layout_y": [
+        3,
+        4,
+        3
+    ],
+    "result_scale_points": [
+        [
+            0,
+            0
+        ],
+        [
+            0,
+            23
+        ],
+        [
+            9,
+            0
+        ]
+    ],
+    "double_spot": [
+        0,
+        1
+    ],
+    "spots_info_names": [
+        "Analyte/Control",
+        "Entrez Gene ID",
+        "Alternate Nomenclature"
+    ],
+    "spots": [
+        {
+            "position": [
+                0,
+                0
+            ],
+            "info": [
+                "Reference Spots",
+                "N/A",
+                "RS"
+            ]
+        },
+        {
+            "position": [
+                0,
+                2
+            ],
+            "info": [
+                "Adiponectin",
+                "9370",
+                "Acrp30"
+            ]
+        },
+        {
+            "position": [
+                0,
+                4
+            ],
+            "info": [
+                "Apolipoprotein A-I",
+                "335",
+                "ApoA1"
+            ]
+        },
+        {
+            "position": [
+                0,
+                6
+            ],
+            "info": [
+                "Angiogenin",
+                "283",
+                ""
+            ]
+        },
+        {
+            "position": [
+                0,
+                8
+            ],
+            "info": [
+                "Angiopoietin-1",
+                "284",
+                "Ang-1, ANGPT1"
+            ]
+        },
+        {
+            "position": [
+                0,
+                10
+            ],
+            "info": [
+                "Angiopoietin-2",
+                "285",
+                "Ang-2, ANGPT2"
+            ]
+        },
+        {
+            "position": [
+                0,
+                12
+            ],
+            "info": [
+                "BAFF",
+                "10673",
+                "BLyS, TNFSF13B"
+            ]
+        },
+        {
+            "position": [
+                0,
+                14
+            ],
+            "info": [
+                "BDNF",
+                "627",
+                "Brain-derived Neurotrophic Factor"
+            ]
+        },
+        {
+            "position": [
+                0,
+                16
+            ],
+            "info": [
+                "Complement Component C5/C5a",
+                "727",
+                "C5/C5a"
+            ]
+        },
+        {
+            "position": [
+                0,
+                18
+            ],
+            "info": [
+                "CD14",
+                "929",
+                ""
+            ]
+        },
+        {
+            "position": [
+                0,
+                20
+            ],
+            "info": [
+                "CD30",
+                "943",
+                "TNFRSF8"
+            ]
+        },
+        {
+            "position": [
+                0,
+                22
+            ],
+            "info": [
+                "Reference Spots",
+                "N/A",
+                "RS"
+            ]
+        },
+        {
+            "position": [
+                1,
+                2
+            ],
+            "info": [
+                "CD40 ligand",
+                "959",
+                "CD40L, TNFSF5, CD154, TRAP"
+            ]
+        },
+        {
+            "position": [
+                1,
+                4
+            ],
+            "info": [
+                "Chitinase 3-like 1",
+                "1116",
+                "CHI3L1, YKL-40"
+            ]
+        },
+        {
+            "position": [
+                1,
+                6
+            ],
+            "info": [
+                "Complement Factor D",
+                "1675",
+                "Adipsin, CFD"
+            ]
+        },
+        {
+            "position": [
+                1,
+                8
+            ],
+            "info": [
+                "C-Reactive Protein",
+                "1401",
+                "CRP"
+            ]
+        },
+        {
+            "position": [
+                1,
+                10
+            ],
+            "info": [
+                "Cripto-1",
+                "6997",
+                "Teratocarcinoma-derived Growth Factor"
+            ]
+        },
+        {
+            "position": [
+                1,
+                12
+            ],
+            "info": [
+                "Cystatin C",
+                "1471",
+                "CST3, ARMD11"
+            ]
+        },
+        {
+            "position": [
+                1,
+                14
+            ],
+            "info": [
+                "Dkk-1",
+                "22943",
+                "Dickkopf-1"
+            ]
+        },
+        {
+            "position": [
+                1,
+                16
+            ],
+            "info": [
+                "DPPIV",
+                "1803",
+                "CD26, DPP4, Dipeptidyl-peptidase IV"
+            ]
+        },
+        {
+            "position": [
+                1,
+                18
+            ],
+            "info": [
+                "EGF",
+                "1950",
+                "Epidermal Growth Factor"
+            ]
+        },
+        {
+            "position": [
+                1,
+                20
+            ],
+            "info": [
+                "Emmprin",
+                "682",
+                "CD147, Basigin"
+            ]
+        },
+        {
+            "position": [
+                2,
+                2
+            ],
+            "info": [
+                "ENA-78",
+                "6374",
+                "CXCL5"
+            ]
+        },
+        {
+            "position": [
+                2,
+                4
+            ],
+            "info": [
+                "Endoglin",
+                "2022",
+                "CD105, ENG"
+            ]
+        },
+        {
+            "position": [
+                2,
+                6
+            ],
+            "info": [
+                "Fas Ligand",
+                "356",
+                "TNFSF6, CD178, CD95L"
+            ]
+        },
+        {
+            "position": [
+                2,
+                8
+            ],
+            "info": [
+                "FGF basic",
+                "2247",
+                "FGF-2"
+            ]
+        },
+        {
+            "position": [
+                2,
+                10
+            ],
+            "info": [
+                "FGF-7",
+                "2252",
+                "KGF"
+            ]
+        },
+        {
+            "position": [
+                2,
+                12
+            ],
+            "info": [
+                "FGF-19",
+                "9965",
+                ""
+            ]
+        },
+        {
+            "position": [
+                2,
+                14
+            ],
+            "info": [
+                "Flt-3 Ligand",
+                "2323",
+                "FLT3LG"
+            ]
+        },
+        {
+            "position": [
+                2,
+                16
+            ],
+            "info": [
+                "G-CSF",
+                "1440",
+                "CSF3"
+            ]
+        },
+        {
+            "position": [
+                2,
+                18
+            ],
+            "info": [
+                "GDF-15",
+                "9518",
+                "MIC-1"
+            ]
+        },
+        {
+            "position": [
+                2,
+                20
+            ],
+            "info": [
+                "GM-CSF",
+                "1437",
+                "CSF2"
+            ]
+        },
+        {
+            "position": [
+                3,
+                0
+            ],
+            "info": [
+                "GRO\u03b1",
+                "2919",
+                "CXCL1, MSGA-\u03b1"
+            ]
+        },
+        {
+            "position": [
+                3,
+                2
+            ],
+            "info": [
+                "Growth Hormone",
+                "2688",
+                "GH, Somatotropin"
+            ]
+        },
+        {
+            "position": [
+                3,
+                4
+            ],
+            "info": [
+                "HGF",
+                "3082",
+                "Scatter Factor, SF"
+            ]
+        },
+        {
+            "position": [
+                3,
+                6
+            ],
+            "info": [
+                "ICAM-1",
+                "3383",
+                "CD54"
+            ]
+        },
+        {
+            "position": [
+                3,
+                8
+            ],
+            "info": [
+                "IFN-\u03b3",
+                "3458",
+                "IFNG"
+            ]
+        },
+        {
+            "position": [
+                3,
+                10
+            ],
+            "info": [
+                "IGFBP-2",
+                "3485",
+                ""
+            ]
+        },
+        {
+            "position": [
+                3,
+                12
+            ],
+            "info": [
+                "IGFBP-3",
+                "3486",
+                ""
+            ]
+        },
+        {
+            "position": [
+                3,
+                14
+            ],
+            "info": [
+                "IL-1\u03b1",
+                "3552",
+                "IL-1F1"
+            ]
+        },
+        {
+            "position": [
+                3,
+                16
+            ],
+            "info": [
+                "IL-1\u03b2",
+                "3553",
+                "IL-1F2"
+            ]
+        },
+        {
+            "position": [
+                3,
+                18
+            ],
+            "info": [
+                "IL-1ra",
+                "3557",
+                "IL-1F3"
+            ]
+        },
+        {
+            "position": [
+                3,
+                20
+            ],
+            "info": [
+                "IL-2",
+                "3558",
+                ""
+            ]
+        },
+        {
+            "position": [
+                3,
+                22
+            ],
+            "info": [
+                "IL-3",
+                "3562",
+                ""
+            ]
+        },
+        {
+            "position": [
+                4,
+                0
+            ],
+            "info": [
+                "IL-4",
+                "3565",
+                ""
+            ]
+        },
+        {
+            "position": [
+                4,
+                2
+            ],
+            "info": [
+                "IL-5",
+                "3567",
+                ""
+            ]
+        },
+        {
+            "position": [
+                4,
+                4
+            ],
+            "info": [
+                "IL-6",
+                "3569",
+                ""
+            ]
+        },
+        {
+            "position": [
+                4,
+                6
+            ],
+            "info": [
+                "IL-8",
+                "3576",
+                "CXCL8"
+            ]
+        },
+        {
+            "position": [
+                4,
+                8
+            ],
+            "info": [
+                "IL-10",
+                "3586",
+                ""
+            ]
+        },
+        {
+            "position": [
+                4,
+                10
+            ],
+            "info": [
+                "IL-11",
+                "3589",
+                ""
+            ]
+        },
+        {
+            "position": [
+                4,
+                12
+            ],
+            "info": [
+                "IL-12 p70",
+                "3593",
+                ""
+            ]
+        },
+        {
+            "position": [
+                4,
+                14
+            ],
+            "info": [
+                "IL-13",
+                "3596",
+                ""
+            ]
+        },
+        {
+            "position": [
+                4,
+                16
+            ],
+            "info": [
+                "IL-15",
+                "3600",
+                ""
+            ]
+        },
+        {
+            "position": [
+                4,
+                18
+            ],
+            "info": [
+                "IL-16",
+                "3603",
+                ""
+            ]
+        },
+        {
+            "position": [
+                4,
+                20
+            ],
+            "info": [
+                "IL-17A",
+                "3605",
+                "IL-17, CTLA8"
+            ]
+        },
+        {
+            "position": [
+                4,
+                22
+            ],
+            "info": [
+                "IL-18 Bpa",
+                "10068",
+                ""
+            ]
+        },
+        {
+            "position": [
+                5,
+                0
+            ],
+            "info": [
+                "IL-19",
+                "29949",
+                ""
+            ]
+        },
+        {
+            "position": [
+                5,
+                2
+            ],
+            "info": [
+                "IL-22",
+                "50616",
+                "IL-TIF"
+            ]
+        },
+        {
+            "position": [
+                5,
+                4
+            ],
+            "info": [
+                "IL-23",
+                "51561",
+                "IL-23A, SGRF"
+            ]
+        },
+        {
+            "position": [
+                5,
+                6
+            ],
+            "info": [
+                "IL-24",
+                "3627",
+                "C49A, FISP, MDA-7, MOB-5, ST16"
+            ]
+        },
+        {
+            "position": [
+                5,
+                8
+            ],
+            "info": [
+                "IL-27",
+                "246778",
+                ""
+            ]
+        },
+        {
+            "position": [
+                5,
+                10
+            ],
+            "info": [
+                "IL-31",
+                "386653",
+                ""
+            ]
+        },
+        {
+            "position": [
+                5,
+                12
+            ],
+            "info": [
+                "IL-32",
+                "9235",
+                ""
+            ]
+        },
+        {
+            "position": [
+                5,
+                14
+            ],
+            "info": [
+                "IL-33",
+                "90865",
+                "C9orf26, DVS27, NF-HEV"
+            ]
+        },
+        {
+            "position": [
+                5,
+                16
+            ],
+            "info": [
+                "IL-34",
+                "146433",
+                "C16orf77"
+            ]
+        },
+        {
+            "position": [
+                5,
+                18
+            ],
+            "info": [
+                "IP-10",
+                "3627",
+                "CXCL10"
+            ]
+        },
+        {
+            "position": [
+                5,
+                20
+            ],
+            "info": [
+                "I-TAC",
+                "6373",
+                "CXCL11, SCYB9B"
+            ]
+        },
+        {
+            "position": [
+                5,
+                22
+            ],
+            "info": [
+                "Kallikrein 3",
+                "354",
+                "PSA, KLK3"
+            ]
+        },
+        {
+            "position": [
+                6,
+                0
+            ],
+            "info": [
+                "Leptin",
+                "3952",
+                "OB"
+            ]
+        },
+        {
+            "position": [
+                6,
+                2
+            ],
+            "info": [
+                "LIF",
+                "3976",
+                ""
+            ]
+        },
+        {
+            "position": [
+                6,
+                4
+            ],
+            "info": [
+                "Lipocalin-2",
+                "3934",
+                "NGAL, LCN2, Siderocalin"
+            ]
+        },
+        {
+            "position": [
+                6,
+                6
+            ],
+            "info": [
+                "MCP-1",
+                "6347",
+                "CCL2, MCAF"
+            ]
+        },
+        {
+            "position": [
+                6,
+                8
+            ],
+            "info": [
+                "MCP-3",
+                "6354",
+                "CCL7, MARC"
+            ]
+        },
+        {
+            "position": [
+                6,
+                10
+            ],
+            "info": [
+                "M-CSF",
+                "1435",
+                "CSF1"
+            ]
+        },
+        {
+            "position": [
+                6,
+                12
+            ],
+            "info": [
+                "MIF",
+                "4282",
+                ""
+            ]
+        },
+        {
+            "position": [
+                6,
+                14
+            ],
+            "info": [
+                "MIG",
+                "4283",
+                "CXCL9"
+            ]
+        },
+        {
+            "position": [
+                6,
+                16
+            ],
+            "info": [
+                "MIP-1\u03b1/MIP-1\u03b2",
+                "6348/6351",
+                "CCL3/CCL4"
+            ]
+        },
+        {
+            "position": [
+                6,
+                18
+            ],
+            "info": [
+                "MIP-3\u03b1",
+                "6364",
+                "CCL20, Exodus-1, LARC"
+            ]
+        },
+        {
+            "position": [
+                6,
+                20
+            ],
+            "info": [
+                "MIP-3\u03b2",
+                "6363",
+                "CCL19, ELC"
+            ]
+        },
+        {
+            "position": [
+                6,
+                22
+            ],
+            "info": [
+                "MMP-9",
+                "4318",
+                "CLG4B, Gelatinase B"
+            ]
+        },
+        {
+            "position": [
+                7,
+                0
+            ],
+            "info": [
+                "Myeloperoxidase",
+                "4353",
+                "MPO, Lactoperoxidase"
+            ]
+        },
+        {
+            "position": [
+                7,
+                2
+            ],
+            "info": [
+                "Osteopontin",
+                "6696",
+                "OPN"
+            ]
+        },
+        {
+            "position": [
+                7,
+                4
+            ],
+            "info": [
+                "PDGF-AA",
+                "5154",
+                ""
+            ]
+        },
+        {
+            "position": [
+                7,
+                6
+            ],
+            "info": [
+                "PDGF-AB/BB",
+                "5154/5155",
+                ""
+            ]
+        },
+        {
+            "position": [
+                7,
+                8
+            ],
+            "info": [
+                "Pentraxin 3",
+                "5806",
+                "PTX3, TSG-14"
+            ]
+        },
+        {
+            "position": [
+                7,
+                10
+            ],
+            "info": [
+                "PF4",
+                "5196",
+                "CXCL4"
+            ]
+        },
+        {
+            "position": [
+                7,
+                12
+            ],
+            "info": [
+                "RAGE",
+                "177",
+                ""
+            ]
+        },
+        {
+            "position": [
+                7,
+                14
+            ],
+            "info": [
+                "RANTES",
+                "6352",
+                "CCL5"
+            ]
+        },
+        {
+            "position": [
+                7,
+                16
+            ],
+            "info": [
+                "RBP-4",
+                "5950",
+                ""
+            ]
+        },
+        {
+            "position": [
+                7,
+                18
+            ],
+            "info": [
+                "Relaxin-2",
+                "6019",
+                "RLN2, RLXH2"
+            ]
+        },
+        {
+            "position": [
+                7,
+                20
+            ],
+            "info": [
+                "Resistin",
+                "56729",
+                "ADSF, FIZZ3, RETN"
+            ]
+        },
+        {
+            "position": [
+                7,
+                22
+            ],
+            "info": [
+                "SDF-1\u03b1",
+                "6387",
+                "CXCL12, PBSF"
+            ]
+        },
+        {
+            "position": [
+                8,
+                0
+            ],
+            "info": [
+                "Serpin E1",
+                "5054",
+                "PAI-I, PAI-1, Nexin"
+            ]
+        },
+        {
+            "position": [
+                8,
+                2
+            ],
+            "info": [
+                "SHBG",
+                "6462",
+                "ABP"
+            ]
+        },
+        {
+            "position": [
+                8,
+                4
+            ],
+            "info": [
+                "ST2",
+                "9173",
+                "IL-1 R4, IL1RL1, ST2L"
+            ]
+        },
+        {
+            "position": [
+                8,
+                6
+            ],
+            "info": [
+                "TARC",
+                "6361",
+                "CCL17"
+            ]
+        },
+        {
+            "position": [
+                8,
+                8
+            ],
+            "info": [
+                "TFF3",
+                "7033",
+                "ITF, TFI"
+            ]
+        },
+        {
+            "position": [
+                8,
+                10
+            ],
+            "info": [
+                "TfR",
+                "7037",
+                "CD71, TFR1, TFRC, TRFR"
+            ]
+        },
+        {
+            "position": [
+                8,
+                12
+            ],
+            "info": [
+                "TGF-\u03b1",
+                "7039",
+                "TGFA"
+            ]
+        },
+        {
+            "position": [
+                8,
+                14
+            ],
+            "info": [
+                "Thrombospondin-1",
+                "7057",
+                "THBS1, TSP-1"
+            ]
+        },
+        {
+            "position": [
+                8,
+                16
+            ],
+            "info": [
+                "TNF-\u03b1",
+                "7124",
+                "TNFSF1A"
+            ]
+        },
+        {
+            "position": [
+                8,
+                18
+            ],
+            "info": [
+                "uPAR",
+                "5329",
+                "PLAUR"
+            ]
+        },
+        {
+            "position": [
+                8,
+                20
+            ],
+            "info": [
+                "VEGF",
+                "7422",
+                "BEGFA"
+            ]
+        },
+        {
+            "position": [
+                9,
+                0
+            ],
+            "info": [
+                "Reference Spots",
+                "N/A",
+                "RS"
+            ]
+        },
+        {
+            "position": [
+                9,
+                4
+            ],
+            "info": [
+                "Vitamin D BP",
+                "2638",
+                "VDB, DBP, VDBP"
+            ]
+        },
+        {
+            "position": [
+                9,
+                6
+            ],
+            "info": [
+                "CD31",
+                "5175",
+                "PECAM-1"
+            ]
+        },
+        {
+            "position": [
+                9,
+                8
+            ],
+            "info": [
+                "TIM-3",
+                "84868",
+                "HAVCR2"
+            ]
+        },
+        {
+            "position": [
+                9,
+                10
+            ],
+            "info": [
+                "VCAM-1",
+                "7412",
+                "CD106"
+            ]
+        },
+        {
+            "position": [
+                9,
+                22
+            ],
+            "info": [
+                "Negative Controls",
+                "N/A",
+                "Control (-)"
+            ]
+        }
+    ]
+}

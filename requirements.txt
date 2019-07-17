@@ -1,0 +1,9 @@
+numpy
+matplotlib
+scipy
+scikit-image
+imageio
+openpyxl
+requests
+ipython
+xmltodict
