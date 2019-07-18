@@ -1,6 +1,11 @@
 # proMAD
 Semiquantitative densitometric measurement of protein microarrays
 
+[![License](https://img.shields.io/github/license/theia-dev/proMAD.svg?style=for-the-badge)](https://github.com/theia-dev/proMAD/blob/master/LICENSE.txt)
+[![Github issues](https://img.shields.io/github/issues/theia-dev/proMAD.svg?style=for-the-badge)](https://github.com/theia-dev/proMAD/issues)
+[![Build](https://img.shields.io/travis/theia-dev/proMAD.svg?style=for-the-badge)](https://travis-ci.org/theia-dev/proMAD)
+
+
 ## Setup
     pip install proMAD
     
@@ -46,9 +51,4 @@ c.names = [['OL', 'ML', 'UL'], [None, 'MR', 'UR']]
 c.preview()
 c.save_images('test_cases/formated_image_folder')  # save to folder (will be created if it does not exist
 ```
-## Example
-in ipython (downloads around 200MB of example data)
-
-    run run.py
-    aa.evaluate()
 
