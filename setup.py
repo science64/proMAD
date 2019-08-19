@@ -4,7 +4,7 @@ from pathlib import Path
 base_dir = Path(__file__).absolute().parent
 read_me = base_dir / 'README.md'
 long_description = read_me.read_text(encoding='utf-8')
-version = '0.0.1'
+version = '0.0.2'
 
 setup(name='proMAD',
       version=version,
@@ -12,7 +12,7 @@ setup(name='proMAD',
       long_description=long_description,
       long_description_content_type='text/markdown',
       url='https://proMAD.dev',
-      download_url=f'https://github.com/theia-dev/proMAD/archive/{version}.zip',
+      download_url=f'https://github.com/theia-dev/proMAD/archive/v{version}.zip',
       author='Anna Jaeschke; Hagen Eckert',
       author_email='',
       license='MIT',

@@ -1,19 +1,21 @@
 from pathlib import Path
-
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 import xmltodict
-from skimage import io
+from skimage import io as ski_io
+import io
 
 
-def scn_file(file_path, out_path=None):
+def scn_file(file, out_path=None):
     """
     Read image and metadata from .scn (Image Lab) files.
     If a out_path is given the extracted data is stored as .tif file instead.
 
     Parameters
     ----------
-    file_path: Path or str
+    file:
+        file can be a path to a file (a string), a file-like object or a path-like object
     out_path: Path or str
 
     Returns
@@ -23,8 +25,16 @@ def scn_file(file_path, out_path=None):
     metadata: dict
 
     """
-    file_path = Path(file_path)
-    bin_data = file_path.read_bytes()
+    if isinstance(file, os.PathLike) or isinstance(file, str):
+        file_path = Path(file)
+        bin_data = file_path.read_bytes()
+    elif isinstance(file, (bytes, bytearray)):
+        bin_data = file
+    elif isinstance(file, (io.RawIOBase, io.BufferedIOBase)):
+        bin_data = file.read()
+    else:
+        raise TypeError('Could not identify the proper type of file variable')
+
     split = bin_data.partition(b'boundary="')[2].partition(b'"')[0]
     x = x_mm = 0
     y = y_mm = 0
@@ -54,7 +64,7 @@ def scn_file(file_path, out_path=None):
         data = data.reshape(x, y)
         meta_data = {'exposure_time': exposure_time, 'image_date': image_date, 'pixel_mm': (x_mm, y_mm)}
         if out_path:
-            io.imsave(out_path, data, metadata=meta_data)
+            ski_io.imsave(out_path, data, metadata=meta_data)
             return None, None
         else:
             return data, meta_data
@@ -130,7 +140,7 @@ class Cutter(object):
         if file_path.suffix == '.scn':
             source_image, meta_data = scn_file(file_path.absolute())
         else:
-            source_image = io.imread(file_path.absolute(), plugin='imageio')
+            source_image = ski_io.imread(file_path.absolute(), plugin='imageio')
             meta_data = None
         self.images.append(dict(name=file_path.name, data=source_image, meta_data=meta_data))
 
@@ -282,4 +292,4 @@ class Cutter(object):
                         out_folder.mkdir(exist_ok=True, parents=True)
                         save_path = str((out_folder/f'{p_name}_{name}{suffix}').absolute())
                         print(f'Save image under "{save_path}"')
-                        io.imsave(save_path, im_part, metadata=meta_data)
+                        ski_io.imsave(save_path, im_part, metadata=meta_data)

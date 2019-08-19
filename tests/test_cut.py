@@ -87,10 +87,22 @@ class TestSCN(unittest.TestCase):
         del cls.cases
 
     def test_load_scn(self):
-        data, meta = scn_file(self.cases / 'raw' / 'raw_00002.scn')
+        test_file_path = self.cases / 'raw' / 'raw_00002.scn'
+        data, meta = scn_file(test_file_path)
         meta_compare = {'exposure_time': 1882.524, 'image_date': '2018-12-05T18:45:49',
                         'pixel_mm': (7.638888888888889, 7.638888888888889)}
 
         self.assertEqual(meta, meta_compare)
         self.assertEqual(hashlib.sha3_256(data.tobytes()).hexdigest(),
+                         '3ce238af1c5313d7d28829593ebe914722e4e5a2d0d3dadbc904d202b2efaa4b')
+
+        binary_data, binary_meta = scn_file(test_file_path.read_bytes())
+        self.assertEqual(meta, binary_meta)
+        self.assertEqual(hashlib.sha3_256(binary_data.tobytes()).hexdigest(),
+                         '3ce238af1c5313d7d28829593ebe914722e4e5a2d0d3dadbc904d202b2efaa4b')
+
+        with test_file_path.open('rb') as fo:
+            fo_data, fo_meta = scn_file(fo)
+        self.assertEqual(meta, fo_meta)
+        self.assertEqual(hashlib.sha3_256(fo_data.tobytes()).hexdigest(),
                          '3ce238af1c5313d7d28829593ebe914722e4e5a2d0d3dadbc904d202b2efaa4b')

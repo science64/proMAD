@@ -25,7 +25,7 @@ aa.evaluate()  # get result dictionary for all spots
 ```
 **Cutter**
 
-* interactive light
+* interactive
 ```python
 from proMAD import Cutter
 c = Cutter()
