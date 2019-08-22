@@ -1,9 +1,10 @@
-numpy
-matplotlib
-scipy
-scikit-image
 imageio
-openpyxl
-requests
 ipython
+matplotlib
+numpy
+openpyxl
+pillow
+requests
+scikit-image
+scipy
 xmltodict

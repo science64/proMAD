@@ -1,9 +1,11 @@
 import json
+import os
 import re
+import io
 import string
+import warnings
 from collections import Counter
 from pathlib import Path
-import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,15 +13,17 @@ from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from scipy import stats
 from scipy.optimize import curve_fit, minimize_scalar
-from skimage import io, img_as_float, img_as_ubyte
+from skimage import io as ski_io
+from skimage import img_as_float, img_as_ubyte
 from skimage import measure
 from skimage import transform
 from skimage.color import rgb2gray
 from skimage.external import tifffile
 from skimage.filters import threshold_otsu
 from skimage.morphology import reconstruction
-from skimage.transform import rotate
+from skimage.transform import rotate, rescale
 from skimage.util import invert
+from PIL import Image
 
 from . import config
 
@@ -314,7 +318,7 @@ class ArrayAnalyse(object):
 
         file_path = Path(file_path)
         self.verbose_print(f'Load image: {file_path}')
-        source_image = io.imread(file_path.absolute(), plugin='imageio')
+        source_image = ski_io.imread(file_path.absolute(), plugin='imageio')
         meta_data = None
         if file_path.suffix.lower() == '.tif':
             with tifffile.TiffFile(str(file_path.absolute())) as tif_data:
@@ -788,7 +792,7 @@ class ArrayAnalyse(object):
             fig.show()
         else:
             align_img = plt.cm.nipy_spectral(align_img)
-            io.imsave(str(Path(file_name).absolute()), align_img)
+            ski_io.imsave(str(Path(file_name).absolute()), align_img)
 
     def control_reac_fit(self, position, c_enzyme=None, file_name=None):
         spot = self.get_spot(position)
@@ -846,9 +850,22 @@ class ArrayAnalyse(object):
                 file_path = str(file_name.with_name(f_name+'_' + name).with_suffix(suffix).absolute())
                 image = plt.cm.gist_ncar(image)[:, :, :3]
                 image = img_as_ubyte(image)
-                io.imsave(file_path, image)
+                ski_io.imsave(file_path, image)
 
-    def contact_sheet(self, file_name=None):
+    def contact_sheet(self, kind='raw', file=None, max_size=None):
+        """
+        Combine a array time series into an overview image.
+
+        Parameters
+        ----------
+        kind: str
+            raw: raw content; bg: background; fg: foreground
+        file:
+            file can be a path to a file (a string), a file-like object or a path-like object;
+            if file is None result is directly shown
+        max_size: int
+            size of the longest edge in pixel
+        """
         if not self.is_finalized:
             warnings.warn('Data collection needs to be finalized to plot the contact sheet.', RuntimeWarning)
             return None
@@ -858,37 +875,42 @@ class ArrayAnalyse(object):
         y_max = int(y_count * self.raw_images.shape[1] + (y_count-1) * pad)
         x_max = int(x_count * self.raw_images.shape[0] + (x_count-1) * pad)
 
-        cs_raw = np.ones((x_max, y_max))
-        cs_bg = np.ones((x_max, y_max))
-        cs_fg = np.ones((x_max, y_max))
+        data_match = {'raw': 'raw_images', 'fg': 'foregrounds', 'bg': 'backgrounds'}
+        image = np.ones((x_max, y_max))
+
         for x_c in range(x_count):
             for y_c in range(y_count):
                 x = x_c * pad + x_c * self.raw_images.shape[0]
                 y = y_c * pad + y_c * self.raw_images.shape[1]
                 try:
-                    cs_raw[x:x + self.raw_images.shape[0], y:y + self.raw_images.shape[1]] = self.raw_images[:, :, x_c * y_count + y_c]
-                    cs_bg[x:x + self.raw_images.shape[0], y:y + self.raw_images.shape[1]] = self.backgrounds[:, :, x_c * y_count + y_c]
-                    cs_fg[x:x + self.raw_images.shape[0], y:y + self.raw_images.shape[1]] = self.foregrounds[:, :, x_c * y_count + y_c]
+                    image[x:x + self.raw_images.shape[0], y:y + self.raw_images.shape[1]] = getattr(self, data_match[kind])[:, :, x_c * y_count + y_c]
                 except IndexError:
                     pass
 
-        for name, image in (('raw', cs_raw), ('foreground', cs_fg), ('background', cs_bg)):
-            if file_name is None:
-                fig, ax = plt.subplots()
-                ax.set_title(f'Contact sheet {name}')
-                ax.imshow(image, interpolation='nearest', cmap=plt.cm.gist_ncar, vmin=0, vmax=1)
-                ax.axes.get_xaxis().set_visible(False)
-                ax.axes.get_yaxis().set_visible(False)
-                fig.show()
+        image = np.log(image+0.1)
+        image = ((image - np.min(image)) * (1 / (np.max(image) - np.min(image))))
 
-            else:
-                file_name = Path(file_name)
-                suffix = file_name.suffix
-                f_name = file_name.with_suffix('').name
-                file_path = str(file_name.with_name(f_name+'_' + name).with_suffix(suffix).absolute())
-                image = plt.cm.gist_ncar(image)[:, :, :3]
-                image = img_as_ubyte(image)
-                io.imsave(file_path, image)
+        if file is None:
+            fig, ax = plt.subplots()
+            ax.set_title(f'Contact sheet {kind}')
+            ax.imshow(image, interpolation='nearest', cmap=plt.cm.CMRmap_r, vmin=0, vmax=1)
+            ax.axes.get_xaxis().set_visible(False)
+            ax.axes.get_yaxis().set_visible(False)
+            fig.show()
+
+        else:
+            image = plt.cm.CMRmap_r(image)[:, :, :3]
+            if max_size:
+                factor = max_size / np.max(image.shape)
+                if factor < 1:
+                    image = rescale(image, factor)
+
+            image = img_as_ubyte(image)
+            if isinstance(file, os.PathLike) or isinstance(file, str):
+                ski_io.imsave(str(Path(file).absolute()), image)
+            elif isinstance(file, (io.RawIOBase, io.BufferedIOBase)):
+                im = Image.fromarray(image)
+                im.save(file, format='JPEG')
 
     def report(self, file_path, norm='hist_raw', report_type='xlsx'):
         if not self.is_finalized:
