@@ -2,6 +2,7 @@ import unittest
 from pathlib import Path
 import io
 import sys
+import warnings
 
 from proMAD import ArrayAnalyse
 
@@ -49,11 +50,24 @@ class LoadImages(TestARY022B):
 
         self.assertEqual(self.aa.is_finalized, True)
         self.assertIn('✅', load_output)
-        output = get_stdout(self.aa.finalize_collection)
-        self.assertIn('Data is already finalized.', output)
-        output = get_stdout(self.aa.load_image, args=[self.cases / 'prepared/prepared_00025.tif'],
-                            kwargs=dict(rotation=90))
-        self.assertIn('Data is already finalized.', output)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+
+            self.aa.finalize_collection()
+
+            self.assertEqual(len(w), 1)
+            self.assertEqual(w[-1].category, RuntimeWarning)
+            self.assertIn("Data is already finalized.", str(w[-1].message))
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+
+            self.aa.load_image(self.cases/'prepared/prepared_00025.tif', rotation=90)
+
+            self.assertEqual(len(w), 1)
+            self.assertEqual(w[-1].category, RuntimeWarning)
+            self.assertIn("Data is already finalized.", str(w[-1].message))
 
 
 class LoadCollection(TestARY022B):

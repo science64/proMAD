@@ -292,4 +292,4 @@ class Cutter(object):
                         out_folder.mkdir(exist_ok=True, parents=True)
                         save_path = str((out_folder/f'{p_name}_{name}{suffix}').absolute())
                         print(f'Save image under "{save_path}"')
-                        ski_io.imsave(save_path, im_part, metadata=meta_data)
+                        ski_io.imsave(save_path, im_part, metadata=meta_data, check_contrast=False)

@@ -3,6 +3,7 @@ import re
 import string
 from collections import Counter
 from pathlib import Path
+import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -53,7 +54,7 @@ class ArrayAnalyse(object):
 
     """
     
-    def __init__(self, array_type):
+    def __init__(self, array_type, silent=False):
         """
         Initialize ArrayAnalyse object
 
@@ -74,13 +75,19 @@ class ArrayAnalyse(object):
         ----------
         array_type: str
             id of the used micro array type
+        silent: bool
+            be silent if True
         """
-        self.array_types = dict()
-        for file_path in config.array_data_folder.iterdir():
-            if file_path.is_file():
-                if file_path.suffix == '.json':
-                    new_array = json.loads(file_path.read_text())
-                    self.array_types[new_array['id']] = new_array
+
+        if not silent:
+            def verbose_print(*args):
+                print(*args)
+        else:
+            def verbose_print(*args):
+                pass
+
+        self.verbose_print = verbose_print
+        self.array_types = self.get_types()
         self.array_data = self.array_types[array_type]
         self.source_images = []
         self.raw_images = []
@@ -142,23 +149,38 @@ class ArrayAnalyse(object):
         return a[0] + b[0], a[1] + b[1]
 
     @staticmethod
-    def list_types():
+    def get_types():
         """
-        List all available array types.
+        Return all available array types.
+
+        Returns
+        -------
+        dict
+            Dictionary with the all array data
 
         """
+
         array_types = dict()
         for file_path in config.array_data_folder.iterdir():
             if file_path.is_file():
                 if file_path.suffix == '.json':
-                    new_array = json.load(file_path.open('r'))
+                    new_array = json.loads(file_path.read_text())
                     array_types[new_array['id']] = new_array
+        return array_types
+
+    @classmethod
+    def list_types(cls):
+        """
+        List all available array types.
+
+        """
+        array_types = cls.get_types()
         for array_id, array in array_types.items():
             print(array_id)
             print(f'\tName: {array["name"]}')
             print(f'\tType: {array["array_type"]}')
             print(f'\tCompany: {array["company"]}')
-            print(f'\tSource: {array["docs_source"]}\n')
+            print(f'\tSource: {array["source"]}\n')
 
     def reset_collection(self):
         """
@@ -192,7 +214,7 @@ class ArrayAnalyse(object):
         """
 
         if self.is_finalized:
-            print("Data is already finalized. You can use reset_collection to start over.")
+            warnings.warn("Data is already finalized. You can use reset_collection to start over.", RuntimeWarning)
             return None
 
         if isinstance(data_input, str):
@@ -212,7 +234,7 @@ class ArrayAnalyse(object):
             elif input_path.is_file():
                 input_file_paths.append(input_path)
         if not input_file_paths:
-            print('Found no images')
+            warnings.warn('Found no images', RuntimeWarning)
             return None
         for file_path in input_file_paths:
             if file_path.name[0] == '.':
@@ -229,11 +251,11 @@ class ArrayAnalyse(object):
 
         """
         if self.is_finalized:
-            print("Data is already finalized. You can use reset_collection to start over.")
+            warnings.warn("Data is already finalized. You can use reset_collection to start over.", RuntimeWarning)
             return None
 
         if len(self.raw_images) == 0:
-            print("There is no data to be finalized.")
+            warnings.warn("There is no data to be finalized.", RuntimeWarning)
             return None
 
         self.bg_parameters = np.array(self.bg_parameters)
@@ -287,11 +309,11 @@ class ArrayAnalyse(object):
         """
 
         if self.is_finalized:
-            print("Data is already finalized. You can use reset_collection to start over.")
+            warnings.warn("Data is already finalized. You can use reset_collection to start over.", RuntimeWarning)
             return None
 
         file_path = Path(file_path)
-        print(f'Load image: {file_path}')
+        self.verbose_print(f'Load image: {file_path}')
         source_image = io.imread(file_path.absolute(), plugin='imageio')
         meta_data = None
         if file_path.suffix.lower() == '.tif':
@@ -304,7 +326,7 @@ class ArrayAnalyse(object):
                     pass
 
         if source_image.ndim == 3:
-            print("\tLoad RGB image. Converting to greyscale alters the result. Use raw grayscale if possible.")
+            warnings.warn("Load RGB image. Converting to greyscale alters the result. Use raw grayscale if possible.", RuntimeWarning)
             source_image = rgb2gray(source_image)
             # if min value is black invert image
             if np.average(source_image) > np.max(source_image)//2:
@@ -319,15 +341,15 @@ class ArrayAnalyse(object):
             used_resolution = np.max(raw_image) - np.min(raw_image)
             over_exposed = np.sum(raw_image >= 1.0)
             if self.debug:
-                print('Quality checks')
-                print(f'\tused resolution: {self._failed_passed(not (np.isnan(used_resolution)) and not (used_resolution < self.test_quality_resolution))} ({used_resolution*100:.1f}%)')
-                print(f'\tfull exposed pixels: {self._failed_passed(not (np.isnan(over_exposed)) and not (over_exposed > self.test_quality_exposure))} ({over_exposed})')
+                self.verbose_print('Quality checks')
+                self.verbose_print(f'\tused resolution: {self._failed_passed(not (np.isnan(used_resolution)) and not (used_resolution < self.test_quality_resolution))} ({used_resolution*100:.1f}%)')
+                self.verbose_print(f'\tfull exposed pixels: {self._failed_passed(not (np.isnan(over_exposed)) and not (over_exposed > self.test_quality_exposure))} ({over_exposed})')
 
             if self.strict:
                 if (np.isnan(used_resolution) or np.isnan(over_exposed) or
                         (used_resolution < self.test_quality_resolution) or
                         (over_exposed > self.test_quality_exposure)):
-                    print('\tImage skipped - quality check failed.')
+                    self.verbose_print('\tImage skipped - quality check failed.')
                     return None
 
             self.source_images.append(source_image)
@@ -422,14 +444,14 @@ class ArrayAnalyse(object):
             fig.show()
 
         if self.debug:
-            print('Warp checks')
-            print(f'\tlength ratio: {self._failed_passed(not (np.isnan(length_test)) and not (abs(length_test-1.0) > self.test_warp_length_ration))} ({length_test:.4f})')
-            print(f'\tangle: {self._failed_passed(not (np.isnan(angle_test)) and not (abs(angle_test-1.0) > self.test_warp_angle))} ({angle_test*90:.2f})')
-            print(f'\tguess distance: {self._failed_passed(not (np.isnan(dis_test)) and not (dis_test > self.test_warp_distance))} ({dis_test:.4f})')
+            self.verbose_print('Warp checks')
+            self.verbose_print(f'\tlength ratio: {self._failed_passed(not (np.isnan(length_test)) and not (abs(length_test-1.0) > self.test_warp_length_ration))} ({length_test:.4f})')
+            self.verbose_print(f'\tangle: {self._failed_passed(not (np.isnan(angle_test)) and not (abs(angle_test-1.0) > self.test_warp_angle))} ({angle_test*90:.2f})')
+            self.verbose_print(f'\tguess distance: {self._failed_passed(not (np.isnan(dis_test)) and not (dis_test > self.test_warp_distance))} ({dis_test:.4f})')
 
         if self.strict:
             if np.isnan(length_test) or np.isnan(angle_test) or np.isnan(dis_test) or abs(length_test-1.0) > self.test_warp_length_ration or abs(angle_test-1.0) > self.test_warp_angle or dis_test > self.test_warp_distance:
-                print('\tImage skipped - position guess failed - image maybe not rotated correctly at %i degrees,\n'
+                self.verbose_print('\tImage skipped - position guess failed - image maybe not rotated correctly at %i degrees,\n'
                       '\t\tor the contrast is not good enough for the feature extraction.' % rotation)
                 return None
 
@@ -522,7 +544,7 @@ class ArrayAnalyse(object):
         """
 
         if not self.is_finalized:
-            print('Data collection needs to be finalized to generate spot data.')
+            warnings.warn('Data collection needs to be finalized to generate spot data.', RuntimeWarning)
             return None
         coordinates = self.get_position_coordinates(position)
         if coordinates is None:
@@ -681,7 +703,7 @@ class ArrayAnalyse(object):
         """
 
         if not self.is_finalized:
-            print('Data collection needs to be finalized to evaluate.')
+            warnings.warn('Data collection needs to be finalized to evaluate.', RuntimeWarning)
             return None
 
         if norm == 'raw':
@@ -696,7 +718,7 @@ class ArrayAnalyse(object):
             evaluate_spots = self.evaluate_spot_hist_raw
         elif norm == 'reac':
             if not self.has_exposure:
-                print('The reaction model needs exposure time date. Please select a different modus.')
+                self.verbose_print('The reaction model needs exposure time date. Please select a different modus.')
                 return None
             evaluate_spots = self.evaluate_spot_reac
         else:
@@ -752,7 +774,7 @@ class ArrayAnalyse(object):
 
     def control_alignment(self, file_name=None):
         if not self.is_finalized:
-            print('Data collection needs to be finalized to plot the alignment data.')
+            warnings.warn('Data collection needs to be finalized to plot the alignment data.', RuntimeWarning)
             return None
         align_img = np.zeros(self.raw_images[:, :, 0].shape)
         for i in range(self.raw_images.shape[2]):
@@ -773,7 +795,7 @@ class ArrayAnalyse(object):
         y_raw = self.evaluate_spots_raw_bg_corrected(spot)
         if c_enzyme is None:
             c_enzyme = self.evaluate_spot_reac(spot)[0]
-        print(c_enzyme)
+        self.verbose_print(c_enzyme)
         y = []
         for t in self.exposure:
             y.append(self.light_reaction(t, c_enzyme))
@@ -828,7 +850,7 @@ class ArrayAnalyse(object):
 
     def contact_sheet(self, file_name=None):
         if not self.is_finalized:
-            print('Data collection needs to be finalized to plot the contact sheet.')
+            warnings.warn('Data collection needs to be finalized to plot the contact sheet.', RuntimeWarning)
             return None
         pad = 20
         y_count = int(np.ceil(np.sqrt(self.raw_images.size) / self.raw_images.shape[1]))
@@ -870,7 +892,7 @@ class ArrayAnalyse(object):
 
     def report(self, file_path, norm='hist_raw', report_type='xlsx'):
         if not self.is_finalized:
-            print('Data collection needs to be finalized to generate a report.')
+            warnings.warn('Data collection needs to be finalized to generate a report.', RuntimeWarning)
             return None
         wb = Workbook()
         ws = wb.create_sheet()
