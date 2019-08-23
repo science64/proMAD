@@ -91,7 +91,15 @@ class LoadImages(TestARY022B):
         self.aa.load_image(self.cases / 'prepared/prepared_00020.tif', rotation=90)
         load_output = get_stdout(self.aa.load_image, args=[self.cases / 'prepared/prepared_00025.tif'],
                                  kwargs=dict(rotation=90))
-        self.aa.load_image(self.cases / 'prepared/prepared_00030.tif', rotation=90)
+        self.aa.load_image(self.cases / 'prepared/prepared_00025.tif', rotation=90)
+
+        content = (self.cases / 'prepared/prepared_00030.tif').read_bytes()
+        mem_im = io.BytesIO(content)
+        self.aa.load_image(mem_im, rotation=90, suffix='.tif')
+
+        with (self.cases / 'prepared/prepared_00032.tif').open('rb') as fo:
+            self.aa.load_image(fo, rotation=90, suffix='.tif')
+
         self.aa.finalize_collection()
 
         self.assertEqual(self.aa.is_finalized, True)

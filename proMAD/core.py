@@ -299,16 +299,20 @@ class ArrayAnalyse(object):
             self.control_alignment()
             self.contact_sheet()
 
-    def load_image(self, file_path, rotation=None):
+    def load_image(self, file, rotation=None, suffix=None):
         """
         Load a single image file into the collection.
 
 
         Parameters
         ----------
-        file_path: Path or str
+        file:
+            file can be a path to a file (a string), a file-like object or a path-like object;
+            if file is None result is directly shown
         rotation: int or float
             apply a rotation to the images
+        suffix: str
+            if a file-like object is submitted the suffix is needed for type identification (".tif", ".png", ...)
 
         """
 
@@ -316,13 +320,28 @@ class ArrayAnalyse(object):
             warnings.warn("Data is already finalized. You can use reset_collection to start over.", RuntimeWarning)
             return None
 
-        file_path = Path(file_path)
-        self.verbose_print(f'Load image: {file_path}')
-        source_image = ski_io.imread(file_path.absolute(), plugin='imageio')
+        file_system = True
+        if isinstance(file, os.PathLike) or isinstance(file, str):
+            self.verbose_print(f'Load image: {file}')
+            source_image = ski_io.imread(Path(file).absolute(), plugin='imageio')
+            suffix = file.suffix.lower()
+
+        elif isinstance(file, (io.RawIOBase, io.BufferedIOBase)):
+            source_image = ski_io.imread(file, plugin='imageio')
+            file_system = False
+        else:
+            warnings.warn(f'Type {type(file)} not supported for read image. (skipped)', RuntimeWarning)
+            return None
         meta_data = None
-        if file_path.suffix.lower() == '.tif':
-            with tifffile.TiffFile(str(file_path.absolute())) as tif_data:
-                tags = [page.tags for page in tif_data.pages]
+
+        if suffix == '.tif':
+            if file_system:
+                with tifffile.TiffFile(str(file.absolute())) as tif_data:
+                    tags = [page.tags for page in tif_data.pages]
+            else:
+                file.seek(0)  # imread does not rewind file properly
+                with tifffile.TiffFile(file) as tif_data:
+                    tags = [page.tags for page in tif_data.pages]
             if tags:
                 try:
                     meta_data = json.loads(tags[0]['image_description'].value)
@@ -330,7 +349,7 @@ class ArrayAnalyse(object):
                     pass
 
         if source_image.ndim == 3:
-            warnings.warn("Load RGB image. Converting to greyscale alters the result. Use raw grayscale if possible.", RuntimeWarning)
+            warnings.warn("Load RGB image. Converting to greyscale alters the result. Use raw greyscale if possible.", RuntimeWarning)
             source_image = rgb2gray(source_image)
             # if min value is black invert image
             if np.average(source_image) > np.max(source_image)//2:
