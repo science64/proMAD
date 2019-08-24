@@ -1,19 +1,20 @@
 from setuptools import setup
 from pathlib import Path
+from proMAD import config
 
 base_dir = Path(__file__).absolute().parent
 read_me = base_dir / 'README.md'
 long_description = read_me.read_text(encoding='utf-8')
-version = '0.0.2'
+version = config.version
 
-setup(name='proMAD',
+setup(name=config.app_name,
       version=version,
       description='Semiquantitative densitometric measurement of protein microarrays',
       long_description=long_description,
       long_description_content_type='text/markdown',
       url='https://proMAD.dev',
       download_url=f'https://github.com/theia-dev/proMAD/archive/v{version}.zip',
-      author='Anna Jaeschke; Hagen Eckert',
+      author=config.app_author,
       author_email='',
       license='MIT',
       packages=['proMAD'],

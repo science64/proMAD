@@ -6,6 +6,7 @@ import string
 import warnings
 from collections import Counter
 from pathlib import Path
+import tarfile
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -90,6 +91,7 @@ class ArrayAnalyse(object):
             def verbose_print(*args):
                 pass
 
+        self.silent = silent
         self.verbose_print = verbose_print
         self.array_types = self.get_types()
         self.array_data = self.array_types[array_type]
@@ -120,6 +122,23 @@ class ArrayAnalyse(object):
         self.is_finalized = False
         self.has_exposure = False
 
+        self.save_list_base = ["meta_data",
+                               "start_time",
+                               "k_reac",
+                               "kappa_fit_count",
+                               "test_warp_length_ration",
+                               "test_warp_angle",
+                               "test_warp_distance",
+                               "test_quality_resolution",
+                               "test_quality_exposure",
+                               "debug",
+                               "strict",
+                               "has_exposure",
+                               "is_finalized",
+                               "_kappa"]
+        self.save_list_data = ['source_images', 'raw_images', 'backgrounds', 'foregrounds',
+                               'bg_parameters', 'exposure']
+
         self.grid_position = np.zeros((sum(self.array_data['net_layout_x']), sum(self.array_data['net_layout_y']), 2))
 
         px, py = 0, 0
@@ -140,6 +159,18 @@ class ArrayAnalyse(object):
         v1_u = v1 / np.linalg.norm(v1)
         v2_u = v2 / np.linalg.norm(v2)
         return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+
+    @staticmethod
+    def _compare_version(a, b):
+        """
+        Return True if version b is the same or higher than version a
+
+        Parameters
+        ----------
+        a: array_like
+        b: array_like
+        """
+        return a[0] < b[0] or (a[0] <= b[0] and a[1] < b[1]) or (a[0] <= b[0] and a[1] <= b[1] and a[2] <= b[2])
 
     @staticmethod
     def _failed_passed(value):
@@ -185,6 +216,82 @@ class ArrayAnalyse(object):
             print(f'\tType: {array["array_type"]}')
             print(f'\tCompany: {array["company"]}')
             print(f'\tSource: {array["source"]}\n')
+
+    def save(self, file):
+        if not self.is_finalized:
+            warnings.warn('Data collection needs to be finalized to save.', RuntimeWarning)
+            return None
+        base_data = dict(array_type=self.array_data['id'],
+                         silent=self.silent,
+                         version=config.version_number)
+        for entry in self.save_list_base:
+            base_data[entry] = getattr(self, entry)
+
+        data_file = io.BytesIO()
+        if self.has_exposure:
+            np.savez_compressed(data_file,
+                                source_images=self.source_images,
+                                raw_images=self.raw_images,
+                                backgrounds=self.backgrounds,
+                                foregrounds=self.foregrounds,
+                                bg_parameters=self.bg_parameters,
+                                exposure=self.exposure,
+                                _fit_selection=self._fit_selection
+                                )
+        else:
+            np.savez_compressed(data_file,
+                                source_images=self.source_images,
+                                raw_images=self.raw_images,
+                                backgrounds=self.backgrounds,
+                                foregrounds=self.foregrounds,
+                                bg_parameters=self.bg_parameters,
+                                )
+
+        if isinstance(file, os.PathLike) or isinstance(file, str):
+            tar = tarfile.open(file, mode="w")
+        elif isinstance(file, (io.RawIOBase, io.BufferedIOBase)):
+            tar = tarfile.open(fileobj=file, mode="w")
+        else:
+            raise TypeError(f'Type {type(file)} not supported for save.')
+
+        base = json.dumps(base_data).encode("utf-8")
+        ti = tarfile.TarInfo("base.json")
+        ti.size = len(base)
+        tar.addfile(ti, io.BytesIO(base))
+
+        ti = tarfile.TarInfo("data.npz")
+        ti.size = data_file.tell()
+        data_file.seek(0)
+        tar.addfile(ti, data_file)
+
+        tar.close()
+
+    @classmethod
+    def load(cls, file):
+        if isinstance(file, os.PathLike) or isinstance(file, str):
+            tar = tarfile.TarFile.open(file)
+        elif isinstance(file, (io.RawIOBase, io.BufferedIOBase)):
+            tar = tarfile.TarFile.open(fileobj=file)
+        else:
+            raise TypeError(f'Type {type(file)} not supported to load.')
+
+        for member in tar.getmembers():
+            if member.name == 'base.json':
+                base_data = json.loads(tar.extractfile(member).read().decode('utf-8'))
+            if member.name == "data.npz":
+                data = np.load(tar.extractfile(member))
+        if not cls._compare_version(config.allowed_load_version, base_data['version']):
+            raise TypeError(f'Save file from version {".".join(base_data["version"])} can not be loaded')
+        aa = cls(base_data['array_type'], silent=base_data['silent'])
+        for name in aa.save_list_base:
+            setattr(aa, name, base_data[name])
+        if aa.has_exposure:
+            aa.save_list_data += ['exposure', '_fit_selection']
+        for name in aa.save_list_data:
+            setattr(aa, name, data[name].copy())
+        tar.close()
+
+        return aa
 
     def reset_collection(self):
         """

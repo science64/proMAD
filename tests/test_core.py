@@ -41,6 +41,11 @@ def hash_mem(mem):
     return mem_hash.hexdigest()
 
 
+def hash_array(array):
+    array_hash = hashlib.sha3_256(array.tobytes())
+    return array_hash.hexdigest()
+
+
 class TestARY022B(unittest.TestCase):
 
     @classmethod
@@ -72,6 +77,16 @@ class TestARY022BCollection(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         del cls.aa
+
+
+class LoadFromFile(unittest.TestCase):
+    def test_load(self):
+        cases = Path(__file__).absolute().resolve().parent / 'cases'
+        aa = ArrayAnalyse.load(cases / 'save' / 'dump.tar')
+        self.assertEqual(hash_array(aa.foregrounds),
+                         'cc98f2cee0d56857b602da8bcc8e19c844059fef00c680358590a6d6e5525ee3')
+        self.assertEqual(hash_array(aa.raw_images),
+                         '95eb787549115f76ddba215c271fe8b31060c8ed6e3bc6685e3f62049c37c12f')
 
 
 class LoadImagesWrongRotation(TestARY022B):
@@ -202,11 +217,24 @@ class LoadCollection(TestARY022BCollection):
         self.assertEqual(hash_mem(contact_sheet_mem),
                          '53187eed9a6a364c8e1cecb59e8a9c7905a2dcfa0b9a6871bb4f2b7e3e591d25')
 
-        out_folder = self.cases / 'raw_processed'
+        out_folder = self.cases / 'test_contact_sheet'
         out_folder.mkdir(exist_ok=True, parents=True)
         self.aa.contact_sheet(file=out_folder / 'contact_sheet.png', max_size=500)
         self.assertEqual(hash_file(out_folder / 'contact_sheet.png'),
                          '58969e660985c26652624e9990079cf68e2e71b62cf82b544e7b77eddc4dddc2')
+        shutil.rmtree(out_folder)
+
+    def test_save(self):
+        save_mem = io.BytesIO()
+        self.aa.save(file=save_mem)
+        self.assertEqual(hash_mem(save_mem),
+                         '5578a7c0b1cf095faf60f092359971d71dadf70518d6c1de2cb399c5948c09b2')
+
+        out_folder = self.cases / 'test_save'
+        out_folder.mkdir(exist_ok=True, parents=True)
+        self.aa.save(out_folder / 'dump.tar')
+        self.assertEqual(hash_file(out_folder / 'dump.tar'),
+                         '5578a7c0b1cf095faf60f092359971d71dadf70518d6c1de2cb399c5948c09b2')
         shutil.rmtree(out_folder)
 
 
