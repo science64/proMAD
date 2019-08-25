@@ -1,0 +1,432 @@
+{
+  "name": "Mouse Angiogenesis Array Kit",
+  "array_type": "Proteome Profiler Array",
+  "company": "R&D Systems, Inc",
+  "source": "https://resources.rndsystems.com/pdfs/datasheets/ary015.pdf",
+  "created": "2019-07-24 11:21:18.968299",
+  "id": "ARY015",
+  "net_skip_size": 0.6666666666666666,
+  "net_layout_x": [
+    2, 4, 4, 4, 4, 4
+  ],
+  "net_layout_y": [
+    1, 4, 1
+  ],
+  "result_scale_points": [
+    [
+      0, 0
+    ], [
+      0, 21
+    ], [
+      5, 0
+    ]
+  ],
+  "double_spot": [
+    0, 1
+  ],
+  "spots_info_names": [
+    "Analyte/Control", "Gene ID", "Alternate Nomenclature"
+  ],
+  "spots": [
+    {
+      "position": [
+        0, 0
+      ],
+      "info": [
+        "Reference Spots", null, null
+      ]
+    }, {
+      "position": [
+        0, 4
+      ],
+      "info": [
+        "ADAMTS1", null, "METH1"
+      ]
+    }, {
+      "position": [
+        0, 6
+      ],
+      "info": [
+        "Amphiregulin", null, "AR"
+      ]
+    }, {
+      "position": [
+        0, 8
+      ],
+      "info": [
+        "Angiogenin", null, "ANG"
+      ]
+    }, {
+      "position": [
+        0, 10
+      ],
+      "info": [
+        "Angiopoietin-1", null, "Ang-1"
+      ]
+    }, {
+      "position": [
+        0, 12
+      ],
+      "info": [
+        "Angiopoietin-3", null, "Ang-3"
+      ]
+    }, {
+      "position": [
+        0, 14
+      ],
+      "info": [
+        "Coagulation Factor III", null, "Tissue Factor, TF"
+      ]
+    }, {
+      "position": [
+        0, 16
+      ],
+      "info": [
+        "CXCL16", null, null
+      ]
+    }, {
+      "position": [
+        0, 20
+      ],
+      "info": [
+        "Reference Spots", null, null
+      ]
+    }, {
+      "position": [
+        1, 2
+      ],
+      "info": [
+        "Cyr61", null, "CCN1, IGFBP-10"
+      ]
+    }, {
+      "position": [
+        1, 4
+      ],
+      "info": [
+        "DLL4", null, null
+      ]
+    }, {
+      "position": [
+        1, 6
+      ],
+      "info": [
+        "DPPIV", null, "CD26"
+      ]
+    }, {
+      "position": [
+        1, 8
+      ],
+      "info": [
+        "EGF", null, null
+      ]
+    }, {
+      "position": [
+        1, 10
+      ],
+      "info": [
+        "Endoglin", null, "CD105"
+      ]
+    }, {
+      "position": [
+        1, 12
+      ],
+      "info": [
+        "Endostatin/Collagen XVIII", null, null
+      ]
+    }, {
+      "position": [
+        1, 14
+      ],
+      "info": [
+        "Endothelin-1", null, "ET-1"
+      ]
+    }, {
+      "position": [
+        1, 16
+      ],
+      "info": [
+        "FGF acidic", null, "FGF-1, ECGF, HBGF-1"
+      ]
+    }, {
+      "position": [
+        1, 18
+      ],
+      "info": [
+        "FGF basic", null, "FGF-2"
+      ]
+    }, {
+      "position": [
+        2, 2
+      ],
+      "info": [
+        "KGF", null, "FGF-7"
+      ]
+    }, {
+      "position": [
+        2, 4
+      ],
+      "info": [
+        "Fractalkine", null, "CX3CL1"
+      ]
+    }, {
+      "position": [
+        2, 6
+      ],
+      "info": [
+        "GM-CSF", null, null
+      ]
+    }, {
+      "position": [
+        2, 8
+      ],
+      "info": [
+        "HB-EGF", null, null
+      ]
+    }, {
+      "position": [
+        2, 10
+      ],
+      "info": [
+        "HGF", null, "Hepatopoietin A"
+      ]
+    }, {
+      "position": [
+        2, 12
+      ],
+      "info": [
+        "IGFBP-1", null, null
+      ]
+    }, {
+      "position": [
+        2, 14
+      ],
+      "info": [
+        "IGFBP-2", null, null
+      ]
+    }, {
+      "position": [
+        2, 16
+      ],
+      "info": [
+        "IGFBP-3", null, null
+      ]
+    }, {
+      "position": [
+        2, 18
+      ],
+      "info": [
+        "IL-1\u03b1", null, "IL-1F1"
+      ]
+    }, {
+      "position": [
+        2, 20
+      ],
+      "info": [
+        "IL-1\u03b2", null, "IL-1F2"
+      ]
+    }, {
+      "position": [
+        3, 2
+      ],
+      "info": [
+        "IL-10", null, "CSIF"
+      ]
+    }, {
+      "position": [
+        3, 4
+      ],
+      "info": [
+        "IP-10", null, "CXCL10, CRG-2"
+      ]
+    }, {
+      "position": [
+        3, 6
+      ],
+      "info": [
+        "KC", null, "CXCL1, CINC-1, GRO\u03b1"
+      ]
+    }, {
+      "position": [
+        3, 8
+      ],
+      "info": [
+        "Leptin", null, "OB"
+      ]
+    }, {
+      "position": [
+        3, 10
+      ],
+      "info": [
+        "MCP-1", null, "CCL2/JE"
+      ]
+    }, {
+      "position": [
+        3, 12
+      ],
+      "info": [
+        "MIP-1\u03b1", null, "CCL3"
+      ]
+    }, {
+      "position": [
+        3, 14
+      ],
+      "info": [
+        "MMP-3 (pro and mature form)", null, null
+      ]
+    }, {
+      "position": [
+        3, 16
+      ],
+      "info": [
+        "MMP-8 (pro form)", null, null
+      ]
+    }, {
+      "position": [
+        3, 18
+      ],
+      "info": [
+        "MMP-9 (pro and active form)", null, null
+      ]
+    }, {
+      "position": [
+        3, 20
+      ],
+      "info": [
+        "NOV", null, "CCN3, IGFBP-9"
+      ]
+    }, {
+      "position": [
+        4, 2
+      ],
+      "info": [
+        "Osteopontin", null, "OPN"
+      ]
+    }, {
+      "position": [
+        4, 4
+      ],
+      "info": [
+        "PD-ECGF", null, null
+      ]
+    }, {
+      "position": [
+        4, 6
+      ],
+      "info": [
+        "PDGF-AA", null, null
+      ]
+    }, {
+      "position": [
+        4, 8
+      ],
+      "info": [
+        "PDGF-AB/PDGF-BB", null, null
+      ]
+    }, {
+      "position": [
+        4, 10
+      ],
+      "info": [
+        "Pentraxin-3", null, "PTX3, TSG-14"
+      ]
+    }, {
+      "position": [
+        4, 12
+      ],
+      "info": [
+        "Platelet Factor 4", null, "CXCL4, PF4"
+      ]
+    }, {
+      "position": [
+        4, 14
+      ],
+      "info": [
+        "PlGF-2", null, null
+      ]
+    }, {
+      "position": [
+        4, 16
+      ],
+      "info": [
+        "Prolactin", null, "PRL"
+      ]
+    }, {
+      "position": [
+        4, 18
+      ],
+      "info": [
+        "Proliferin", null, null
+      ]
+    }, {
+      "position": [
+        5, 0
+      ],
+      "info": [
+        "Reference Spots", null, null
+      ]
+    }, {
+      "position": [
+        5, 2
+      ],
+      "info": [
+        "SDF-1", null, "CXCL12"
+      ]
+    }, {
+      "position": [
+        5, 4
+      ],
+      "info": [
+        "Serpin E1", null, "PAI-1"
+      ]
+    }, {
+      "position": [
+        5, 6
+      ],
+      "info": [
+        "Serpin F1", null, "PEDF"
+      ]
+    }, {
+      "position": [
+        5, 8
+      ],
+      "info": [
+        "Thrombospondin-2", null, "TSP-2"
+      ]
+    }, {
+      "position": [
+        5, 10
+      ],
+      "info": [
+        "TIMP-1", null, null
+      ]
+    }, {
+      "position": [
+        5, 12
+      ],
+      "info": [
+        "TIMP-4", null, null
+      ]
+    }, {
+      "position": [
+        5, 14
+      ],
+      "info": [
+        "VEGF", null, "VPF"
+      ]
+    }, {
+      "position": [
+        5, 16
+      ],
+      "info": [
+        "VEGF-B", null, "VRF"
+      ]
+    }, {
+      "position": [
+        5, 18
+      ],
+      "info": [
+        "Negative Control", null, "Control (-)"
+      ]
+    }
+  ]
+}

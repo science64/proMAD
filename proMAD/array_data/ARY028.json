@@ -1,0 +1,838 @@
+{
+  "name": "Mouse XL Cytokine Array Kit",
+  "array_type": "Proteome Profiler Array",
+  "company": "R&D Systems, Inc",
+  "source": "https://resources.rndsystems.com/pdfs/datasheets/ary028.pdf",
+  "created": "2019-07-24 10:38:50.682199",
+  "id": "ARY028",
+  "net_skip_size": 0.6666666666666666,
+  "net_layout_x": [
+    4, 4, 4, 4, 4, 4
+  ],
+  "net_layout_y": [
+    3, 4, 3
+  ],
+  "result_scale_points": [
+    [
+      0, 0
+    ], [
+      0, 23
+    ], [
+      9, 0
+    ]
+  ],
+  "double_spot": [
+    0, 1
+  ],
+  "spots_info_names": [
+    "Analyte/Control", "Entrez Gene ID", "Alternate Nomenclature"
+  ],
+  "spots": [
+    {
+      "position": [
+        0, 0
+      ],
+      "info": [
+        "Reference Spots", null, null
+      ]
+    }, {
+      "position": [
+        0, 2
+      ],
+      "info": [
+        "Adiponectin/Acrp30", "11450", "AdipoQ"
+      ]
+    }, {
+      "position": [
+        0, 4
+      ],
+      "info": [
+        "Amphiregulin", "11839", "AR, SDGF"
+      ]
+    }, {
+      "position": [
+        0, 6
+      ],
+      "info": [
+        "Angiopoietin-1", "11600", "Ang-1, Angpt1"
+      ]
+    }, {
+      "position": [
+        0, 8
+      ],
+      "info": [
+        "Angiopoietin-2", "11601", "Ang-2, Angpt2"
+      ]
+    }, {
+      "position": [
+        0, 10
+      ],
+      "info": [
+        "Angiopoietin-like 3", "30924", "ANGPT-L3"
+      ]
+    }, {
+      "position": [
+        0, 12
+      ],
+      "info": [
+        "BAFF/BLyS/TNFSF13B", "24099", "CD257, TALL1, THANK, ZTNF4"
+      ]
+    }, {
+      "position": [
+        0, 14
+      ],
+      "info": [
+        "C1q R1/CD93", "17064", "AA4 Antigen, C1q Rp, CD93"
+      ]
+    }, {
+      "position": [
+        0, 16
+      ],
+      "info": [
+        "CCL2/JE/MCP-1", "20296", "MCAF"
+      ]
+    }, {
+      "position": [
+        0, 18
+      ],
+      "info": [
+        "CCL3/CCL4/MIP-1\u03b1/\u03b2", "20302/20303", null
+      ]
+    }, {
+      "position": [
+        0, 20
+      ],
+      "info": [
+        "CCL5/RANTES", "20304", "SISd"
+      ]
+    }, {
+      "position": [
+        0, 22
+      ],
+      "info": [
+        "Reference Spots", null, null
+      ]
+    }, {
+      "position": [
+        1, 2
+      ],
+      "info": [
+        "CCL6/C10", "20305", "MRP-1"
+      ]
+    }, {
+      "position": [
+        1, 4
+      ],
+      "info": [
+        "CCL11/Eotaxin", "20292", null
+      ]
+    }, {
+      "position": [
+        1, 6
+      ],
+      "info": [
+        "CCL12/MCP-5", "20293", null
+      ]
+    }, {
+      "position": [
+        1, 8
+      ],
+      "info": [
+        "CCL17/TARC", "20295", null
+      ]
+    }, {
+      "position": [
+        1, 10
+      ],
+      "info": [
+        "CCL19/MIP-3\u03b2", "24047", "ELC"
+      ]
+    }, {
+      "position": [
+        1, 12
+      ],
+      "info": [
+        "CCL20/MIP-3\u03b1", "20297", "exodus-1, LARC"
+      ]
+    }, {
+      "position": [
+        1, 14
+      ],
+      "info": [
+        "CCL21/6Ckine", "18829", "exodus-2, SCYA21, SLC, TCA-4"
+      ]
+    }, {
+      "position": [
+        1, 16
+      ],
+      "info": [
+        "CCL22/MDC", "20299", "ABCD-1, MDC, STCP-1"
+      ]
+    }, {
+      "position": [
+        1, 18
+      ],
+      "info": [
+        "CD14", "12475", null
+      ]
+    }, {
+      "position": [
+        1, 20
+      ],
+      "info": [
+        "CD40/TNFRSF5", "21939", null
+      ]
+    }, {
+      "position": [
+        2, 2
+      ],
+      "info": [
+        "CD160", "54215", "Natural killer cell receptor BY55, NK1; NK28"
+      ]
+    }, {
+      "position": [
+        2, 4
+      ],
+      "info": [
+        "Chemerin", "71660", "RARRES2, TIG-2"
+      ]
+    }, {
+      "position": [
+        2, 6
+      ],
+      "info": [
+        "Chitinase 3-like 1", "12654", "CHI3L1, Cgp39, YKL40"
+      ]
+    }, {
+      "position": [
+        2, 8
+      ],
+      "info": [
+        "Coagulation Factor III/Tissue Factor", "14066", "TF, CD142, Thromboplastin"
+      ]
+    }, {
+      "position": [
+        2, 10
+      ],
+      "info": [
+        "Complement Component C5/C5a", "15139", "C5/C5a"
+      ]
+    }, {
+      "position": [
+        2, 12
+      ],
+      "info": [
+        "Complement Factor D", "11537", "Adipsin, C3 convertase activator, Properdin factor D"
+      ]
+    }, {
+      "position": [
+        2, 14
+      ],
+      "info": [
+        "C-Reactive Protein/CRP", "12944", null
+      ]
+    }, {
+      "position": [
+        2, 16
+      ],
+      "info": [
+        "CX3CL1/Fractalkine", "20312", "FKN, Neurotactin"
+      ]
+    }, {
+      "position": [
+        2, 18
+      ],
+      "info": [
+        "CXCL1/KC", "14825", "CINC-1; GRO alpha; KC; MGSA-alpha"
+      ]
+    }, {
+      "position": [
+        2, 20
+      ],
+      "info": [
+        "CXCL2/MIP-2", "20310", "GRO\u03b2, GRO2, CINC-3"
+      ]
+    }, {
+      "position": [
+        3, 0
+      ],
+      "info": [
+        "CXCL9/MIG", "17329", "CRG-10, CMK"
+      ]
+    }, {
+      "position": [
+        3, 2
+      ],
+      "info": [
+        "CXCL10/IP-10", "15945", "CRG-2, C7"
+      ]
+    }, {
+      "position": [
+        3, 4
+      ],
+      "info": [
+        "CXCL11/I-TAC", "56066", "H174, SCYB9B"
+      ]
+    }, {
+      "position": [
+        3, 6
+      ],
+      "info": [
+        "CXCL13/BLC/BCA-1", "55985", null
+      ]
+    }, {
+      "position": [
+        3, 8
+      ],
+      "info": [
+        "CXCL16", "66102", "SRPSOX"
+      ]
+    }, {
+      "position": [
+        3, 10
+      ],
+      "info": [
+        "Cystatin C", "13010", "ARMD11, CST3, Gamma-trace"
+      ]
+    }, {
+      "position": [
+        3, 12
+      ],
+      "info": [
+        "DKK-1", "13380", "Dickkopf-1"
+      ]
+    }, {
+      "position": [
+        3, 14
+      ],
+      "info": [
+        "DPPIV/CD26", "13482", "Dpp4, Dipeptidyl-peptidase IV"
+      ]
+    }, {
+      "position": [
+        3, 16
+      ],
+      "info": [
+        "EGF", "13645", "Epidermal Growth Factor"
+      ]
+    }, {
+      "position": [
+        3, 18
+      ],
+      "info": [
+        "Endoglin/CD105", "13805", "ENG"
+      ]
+    }, {
+      "position": [
+        3, 20
+      ],
+      "info": [
+        "Endostatin", "12822", "Col18a1"
+      ]
+    }, {
+      "position": [
+        3, 22
+      ],
+      "info": [
+        "Fetuin A/AHSG", "11625", "AHSG, alpha-2-HS-glycoprotein"
+      ]
+    }, {
+      "position": [
+        4, 0
+      ],
+      "info": [
+        "FGF acidic", "14164", "FGF-1"
+      ]
+    }, {
+      "position": [
+        4, 2
+      ],
+      "info": [
+        "FGF-21", "56636", null
+      ]
+    }, {
+      "position": [
+        4, 4
+      ],
+      "info": [
+        "Flt-3 Ligand", "14256", "Flt3lg"
+      ]
+    }, {
+      "position": [
+        4, 6
+      ],
+      "info": [
+        "Gas 6", "14456", "Growth Arrest Specific"
+      ]
+    }, {
+      "position": [
+        4, 8
+      ],
+      "info": [
+        "G-CSF", "12985", "Csf3"
+      ]
+    }, {
+      "position": [
+        4, 10
+      ],
+      "info": [
+        "GDF-15", "23886", "MIC-1"
+      ]
+    }, {
+      "position": [
+        4, 12
+      ],
+      "info": [
+        "GM-CSF", "12981", "Csf2"
+      ]
+    }, {
+      "position": [
+        4, 14
+      ],
+      "info": [
+        "HGF", "15234", "Scatter Factor, SF, Hepatopoietin-A"
+      ]
+    }, {
+      "position": [
+        4, 16
+      ],
+      "info": [
+        "ICAM-1/CD54", "15894", null
+      ]
+    }, {
+      "position": [
+        4, 18
+      ],
+      "info": [
+        "IFN-\u03b3", "15978", "IFNG"
+      ]
+    }, {
+      "position": [
+        4, 20
+      ],
+      "info": [
+        "IGFBP-1", "16006", null
+      ]
+    }, {
+      "position": [
+        4, 22
+      ],
+      "info": [
+        "IGFBP-2", "16008", null
+      ]
+    }, {
+      "position": [
+        5, 0
+      ],
+      "info": [
+        "IGFBP-3", "16009", null
+      ]
+    }, {
+      "position": [
+        5, 2
+      ],
+      "info": [
+        "IGFBP-5", "16011", null
+      ]
+    }, {
+      "position": [
+        5, 4
+      ],
+      "info": [
+        "IGFBP-6", "16012", null
+      ]
+    }, {
+      "position": [
+        5, 6
+      ],
+      "info": [
+        "IL-1\u03b1/IL-1F1", "16175", null
+      ]
+    }, {
+      "position": [
+        5, 8
+      ],
+      "info": [
+        "IL-1\u03b2/IL-1F2", "16176", null
+      ]
+    }, {
+      "position": [
+        5, 10
+      ],
+      "info": [
+        "IL-1ra/IL-1F3", "16181", "IL1RN"
+      ]
+    }, {
+      "position": [
+        5, 12
+      ],
+      "info": [
+        "IL-2", "16183", null
+      ]
+    }, {
+      "position": [
+        5, 14
+      ],
+      "info": [
+        "IL-3", "16187", null
+      ]
+    }, {
+      "position": [
+        5, 16
+      ],
+      "info": [
+        "IL-4", "16189", "B cell-stimulatory factor-1"
+      ]
+    }, {
+      "position": [
+        5, 18
+      ],
+      "info": [
+        "IL-5", "16191", null
+      ]
+    }, {
+      "position": [
+        5, 20
+      ],
+      "info": [
+        "IL-6", "16193", null
+      ]
+    }, {
+      "position": [
+        5, 22
+      ],
+      "info": [
+        "IL-7", "16196", null
+      ]
+    }, {
+      "position": [
+        6, 0
+      ],
+      "info": [
+        "IL-10", "16153", "CSIF"
+      ]
+    }, {
+      "position": [
+        6, 2
+      ],
+      "info": [
+        "IL-11", "16156", null
+      ]
+    }, {
+      "position": [
+        6, 4
+      ],
+      "info": [
+        "IL-12 p40", "16160", null
+      ]
+    }, {
+      "position": [
+        6, 6
+      ],
+      "info": [
+        "IL-13", "16163", null
+      ]
+    }, {
+      "position": [
+        6, 8
+      ],
+      "info": [
+        "IL-15", "16168", null
+      ]
+    }, {
+      "position": [
+        6, 10
+      ],
+      "info": [
+        "IL-17A", "16171", null
+      ]
+    }, {
+      "position": [
+        6, 12
+      ],
+      "info": [
+        "IL-22", "50929", "IL-TIF"
+      ]
+    }, {
+      "position": [
+        6, 14
+      ],
+      "info": [
+        "IL-23", "83430", null
+      ]
+    }, {
+      "position": [
+        6, 16
+      ],
+      "info": [
+        "IL-27 p28", "246779", null
+      ]
+    }, {
+      "position": [
+        6, 18
+      ],
+      "info": [
+        "IL-28A/B", "330496/338374", null
+      ]
+    }, {
+      "position": [
+        6, 20
+      ],
+      "info": [
+        "IL-33", "77125", "NF HEV, DVS 27"
+      ]
+    }, {
+      "position": [
+        6, 22
+      ],
+      "info": [
+        "LDL R", "16835", "low density lipoprotein receptor"
+      ]
+    }, {
+      "position": [
+        7, 0
+      ],
+      "info": [
+        "Leptin", "16846", "OB"
+      ]
+    }, {
+      "position": [
+        7, 2
+      ],
+      "info": [
+        "LIF", "16878", null
+      ]
+    }, {
+      "position": [
+        7, 4
+      ],
+      "info": [
+        "Lipocalin-2/NGAL", "16819", "Siderocalin, 24p3"
+      ]
+    }, {
+      "position": [
+        7, 6
+      ],
+      "info": [
+        "LIX", "20311", "CXCL5, GCP-2, ENA-78"
+      ]
+    }, {
+      "position": [
+        7, 8
+      ],
+      "info": [
+        "M-CSF", "12977", "CSF-1"
+      ]
+    }, {
+      "position": [
+        7, 10
+      ],
+      "info": [
+        "MMP-2", "17390", "Gelatinase A"
+      ]
+    }, {
+      "position": [
+        7, 12
+      ],
+      "info": [
+        "MMP-3", "17392", "Stromelysin-1"
+      ]
+    }, {
+      "position": [
+        7, 14
+      ],
+      "info": [
+        "MMP-9", "17395", "Clg4b, Gelatinase B, GELB"
+      ]
+    }, {
+      "position": [
+        7, 16
+      ],
+      "info": [
+        "Myeloperoxidase", "17523", "MPO"
+      ]
+    }, {
+      "position": [
+        7, 18
+      ],
+      "info": [
+        "Osteopontin (OPN)", "20750", "Eta-1, Spp1"
+      ]
+    }, {
+      "position": [
+        7, 20
+      ],
+      "info": [
+        "Osteoprotegerin/TNFRSF11B", "18383", "OPG, Ocif"
+      ]
+    }, {
+      "position": [
+        7, 22
+      ],
+      "info": [
+        "PD-ECGF/Thymidine phosphorylase", "72962", "dThdPase, ECGF1, Gliostatin, MEDPS1, MNGIE"
+      ]
+    }, {
+      "position": [
+        8, 0
+      ],
+      "info": [
+        "PDGF-BB", "18591", null
+      ]
+    }, {
+      "position": [
+        8, 2
+      ],
+      "info": [
+        "Pentraxin 2/SAP", "20219", "PTX2"
+      ]
+    }, {
+      "position": [
+        8, 4
+      ],
+      "info": [
+        "Pentraxin 3/TSG-14", "19288", "PTX3"
+      ]
+    }, {
+      "position": [
+        8, 6
+      ],
+      "info": [
+        "Periostin/OSF-2", "50706", "Fasciclin I-like, POSTN, TRIF52"
+      ]
+    }, {
+      "position": [
+        8, 8
+      ],
+      "info": [
+        "Pref-1/DLK-1/FA1", "13386", "DLK1, pG2, ZOG"
+      ]
+    }, {
+      "position": [
+        8, 10
+      ],
+      "info": [
+        "Proliferin", "18811", "MRP"
+      ]
+    }, {
+      "position": [
+        8, 12
+      ],
+      "info": [
+        "Proprotein Convertase 9/PCSK9", "100102", "NARC-1"
+      ]
+    }, {
+      "position": [
+        8, 14
+      ],
+      "info": [
+        "RAGE", "11596", "AGER"
+      ]
+    }, {
+      "position": [
+        8, 16
+      ],
+      "info": [
+        "RBP4", "19662", "Retinol-Binding Protein 4"
+      ]
+    }, {
+      "position": [
+        8, 18
+      ],
+      "info": [
+        "Reg3G", "19695", "PAP3"
+      ]
+    }, {
+      "position": [
+        8, 20
+      ],
+      "info": [
+        "Resistin", "57264", "ADSF, FIZZ3"
+      ]
+    }, {
+      "position": [
+        9, 0
+      ],
+      "info": [
+        "Reference Spots", null, null
+      ]
+    }, {
+      "position": [
+        9, 2
+      ],
+      "info": [
+        "E-Selectin/CD62E", "20339", "ELAM1, LECAM2, Sele"
+      ]
+    }, {
+      "position": [
+        9, 4
+      ],
+      "info": [
+        "P-Selectin/CD62P", "20344", "GMP-140, LECAM3, Selep"
+      ]
+    }, {
+      "position": [
+        9, 6
+      ],
+      "info": [
+        "Serpin E1/PAI-1", "18787", "Nexin, PLANH1"
+      ]
+    }, {
+      "position": [
+        9, 8
+      ],
+      "info": [
+        "Serpin F1/PEDF", "20317", "EPC-1"
+      ]
+    }, {
+      "position": [
+        9, 10
+      ],
+      "info": [
+        "Thrombopoietin", "21832", "Tpo, MGDF"
+      ]
+    }, {
+      "position": [
+        9, 12
+      ],
+      "info": [
+        "TIM-1/KIM-1/HAVCR", "171283", null
+      ]
+    }, {
+      "position": [
+        9, 14
+      ],
+      "info": [
+        "TNF-\u03b1", "21926", "TNFSF1A"
+      ]
+    }, {
+      "position": [
+        9, 16
+      ],
+      "info": [
+        "VCAM-1/CD106", "22329", null
+      ]
+    }, {
+      "position": [
+        9, 18
+      ],
+      "info": [
+        "VEGF", "22339", "VEGF-A, VPF"
+      ]
+    }, {
+      "position": [
+        9, 20
+      ],
+      "info": [
+        "WISP-1/CCN4", "22402", null
+      ]
+    }, {
+      "position": [
+        9, 22
+      ],
+      "info": [
+        "Negative Control", null, null
+      ]
+    }
+  ]
+}

@@ -1,0 +1,446 @@
+{
+  "name": "Human Angiogenesis Array Kit",
+  "array_type": "Proteome Profiler Array",
+  "company": "R&D Systems, Inc",
+  "source": "https://resources.rndsystems.com/pdfs/datasheets/ary007.pdf",
+  "created": "2019-07-24 11:34:07.754299",
+  "id": "ARY007",
+  "net_skip_size": 0.6666666666666666,
+  "net_layout_x": [
+    4, 4, 4, 4, 4, 4
+  ],
+  "net_layout_y": [
+    1, 4, 1
+  ],
+  "result_scale_points": [
+    [
+      0, 0
+    ], [
+      0, 23
+    ], [
+      5, 0
+    ]
+  ],
+  "double_spot": [
+    0, 1
+  ],
+  "spots_info_names": [
+    "Target/Control", "Gene ID", "Alternate Nomenclature"
+  ],
+  "spots": [
+    {
+      "position": [
+        0, 0
+      ],
+      "info": [
+        "Reference Spots", null, null
+      ]
+    }, {
+      "position": [
+        0, 4
+      ],
+      "info": [
+        "Activin A", "3624", null
+      ]
+    }, {
+      "position": [
+        0, 6
+      ],
+      "info": [
+        "ADAMTS-1", "9510", null
+      ]
+    }, {
+      "position": [
+        0, 8
+      ],
+      "info": [
+        "Angiogenin", "283", "ANG"
+      ]
+    }, {
+      "position": [
+        0, 10
+      ],
+      "info": [
+        "Angiopoietin-1", "284", "Ang-1"
+      ]
+    }, {
+      "position": [
+        0, 12
+      ],
+      "info": [
+        "Angiopoietin-2", "285", "Ang-2"
+      ]
+    }, {
+      "position": [
+        0, 14
+      ],
+      "info": [
+        "Angiostatin/Plasminogen", "5340", null
+      ]
+    }, {
+      "position": [
+        0, 16
+      ],
+      "info": [
+        "Amphiregulin", "374", "AR"
+      ]
+    }, {
+      "position": [
+        0, 18
+      ],
+      "info": [
+        "Artemin", "9048", null
+      ]
+    }, {
+      "position": [
+        0, 22
+      ],
+      "info": [
+        "Reference Spots", null, null
+      ]
+    }, {
+      "position": [
+        1, 0
+      ],
+      "info": [
+        "Coagulation Factor III", "2152", "TF"
+      ]
+    }, {
+      "position": [
+        1, 2
+      ],
+      "info": [
+        "CXCL16", "58191", null
+      ]
+    }, {
+      "position": [
+        1, 4
+      ],
+      "info": [
+        "DPPIV", "1803", "CD26"
+      ]
+    }, {
+      "position": [
+        1, 6
+      ],
+      "info": [
+        "EGF", "1950", null
+      ]
+    }, {
+      "position": [
+        1, 8
+      ],
+      "info": [
+        "EG-VEGF", "84432", "PK1"
+      ]
+    }, {
+      "position": [
+        1, 10
+      ],
+      "info": [
+        "Endoglin", "2022", "CD105"
+      ]
+    }, {
+      "position": [
+        1, 12
+      ],
+      "info": [
+        "Endostatin/Collagen XVIII", "80781", null
+      ]
+    }, {
+      "position": [
+        1, 14
+      ],
+      "info": [
+        "Endothelin-1", "1906", "ET-1"
+      ]
+    }, {
+      "position": [
+        1, 16
+      ],
+      "info": [
+        "FGF acidic", "2246", "FGF-1"
+      ]
+    }, {
+      "position": [
+        1, 18
+      ],
+      "info": [
+        "FGF basic", "2263", "FGFR2"
+      ]
+    }, {
+      "position": [
+        1, 20
+      ],
+      "info": [
+        "FGF-4", "2249", null
+      ]
+    }, {
+      "position": [
+        1, 22
+      ],
+      "info": [
+        "FGF-7", "2252", "KGF"
+      ]
+    }, {
+      "position": [
+        2, 0
+      ],
+      "info": [
+        "GDNF", "2668", null
+      ]
+    }, {
+      "position": [
+        2, 2
+      ],
+      "info": [
+        "GM-CSF", "1437", null
+      ]
+    }, {
+      "position": [
+        2, 4
+      ],
+      "info": [
+        "HB-EGF", "1839", null
+      ]
+    }, {
+      "position": [
+        2, 6
+      ],
+      "info": [
+        "HGF", "3082", null
+      ]
+    }, {
+      "position": [
+        2, 8
+      ],
+      "info": [
+        "IGFBP-1", "3484", null
+      ]
+    }, {
+      "position": [
+        2, 10
+      ],
+      "info": [
+        "IGFBP-2", "3485", null
+      ]
+    }, {
+      "position": [
+        2, 12
+      ],
+      "info": [
+        "IGFBP-3", "3486", null
+      ]
+    }, {
+      "position": [
+        2, 14
+      ],
+      "info": [
+        "IL-1\u03b2", "3553", "IL-1F2"
+      ]
+    }, {
+      "position": [
+        2, 16
+      ],
+      "info": [
+        "IL-8", "3576", "CXCL8"
+      ]
+    }, {
+      "position": [
+        2, 18
+      ],
+      "info": [
+        "LAP (TGF-\u03b21)", "7040", null
+      ]
+    }, {
+      "position": [
+        2, 20
+      ],
+      "info": [
+        "Leptin", "3952", null
+      ]
+    }, {
+      "position": [
+        2, 22
+      ],
+      "info": [
+        "MCP-1", "6347", "CCL2"
+      ]
+    }, {
+      "position": [
+        3, 0
+      ],
+      "info": [
+        "MIP-1\u03b1", "6348", "CCL3"
+      ]
+    }, {
+      "position": [
+        3, 2
+      ],
+      "info": [
+        "MMP-8", "4317", null
+      ]
+    }, {
+      "position": [
+        3, 4
+      ],
+      "info": [
+        "MMP-9", "4318", null
+      ]
+    }, {
+      "position": [
+        3, 6
+      ],
+      "info": [
+        "NRG1-\u03b21", "3084", "HRG1-\u03b21"
+      ]
+    }, {
+      "position": [
+        3, 8
+      ],
+      "info": [
+        "Pentraxin 3 (PTX3)", "5806", "TSG-14"
+      ]
+    }, {
+      "position": [
+        3, 10
+      ],
+      "info": [
+        "PD-ECGF", "1890", null
+      ]
+    }, {
+      "position": [
+        3, 12
+      ],
+      "info": [
+        "PDGF-AA", "5154", null
+      ]
+    }, {
+      "position": [
+        3, 14
+      ],
+      "info": [
+        "PDGF-AB/PDGF-BB", "5155", null
+      ]
+    }, {
+      "position": [
+        3, 16
+      ],
+      "info": [
+        "Persephin", "5623", null
+      ]
+    }, {
+      "position": [
+        3, 18
+      ],
+      "info": [
+        "Platelet Factor 4 (PF4)", "5196", "CXCL4"
+      ]
+    }, {
+      "position": [
+        3, 20
+      ],
+      "info": [
+        "PlGF", "5228", null
+      ]
+    }, {
+      "position": [
+        3, 22
+      ],
+      "info": [
+        "Prolactin", "5617", null
+      ]
+    }, {
+      "position": [
+        4, 0
+      ],
+      "info": [
+        "Serpin B5", "5268", "Maspin"
+      ]
+    }, {
+      "position": [
+        4, 2
+      ],
+      "info": [
+        "Serpin E1", "5054", "PAI-1"
+      ]
+    }, {
+      "position": [
+        4, 4
+      ],
+      "info": [
+        "Serpin F1", "5176", "PEDF"
+      ]
+    }, {
+      "position": [
+        4, 6
+      ],
+      "info": [
+        "TIMP-1", "7076", null
+      ]
+    }, {
+      "position": [
+        4, 8
+      ],
+      "info": [
+        "TIMP-4", "7079", null
+      ]
+    }, {
+      "position": [
+        4, 10
+      ],
+      "info": [
+        "Thrombospondin-1", "7057", "TSP-1"
+      ]
+    }, {
+      "position": [
+        4, 12
+      ],
+      "info": [
+        "Thrombospondin-2", "7058", "TSP-2"
+      ]
+    }, {
+      "position": [
+        4, 14
+      ],
+      "info": [
+        "uPA", "5328", null
+      ]
+    }, {
+      "position": [
+        4, 16
+      ],
+      "info": [
+        "Vasohibin", "22846", null
+      ]
+    }, {
+      "position": [
+        4, 18
+      ],
+      "info": [
+        "VEGF", "7422", null
+      ]
+    }, {
+      "position": [
+        4, 20
+      ],
+      "info": [
+        "VEGF-C", "7424", null
+      ]
+    }, {
+      "position": [
+        5, 0
+      ],
+      "info": [
+        "Reference Spots", null, null
+      ]
+    }, {
+      "position": [
+        5, 22
+      ],
+      "info": [
+        "Negative Control", null, "Control (-)"
+      ]
+    }
+  ]
+}
