@@ -171,7 +171,6 @@ class LoadImages(TestARY022B):
             self.assertEqual(len(w), 1)
             self.assertEqual(w[-1].category, RuntimeWarning)
             self.assertIn("Data is already finalized.", str(w[-1].message))
-        self.aa.save('/Users/nathan/Documents/projects/proMAD/tests/cases/save/dump.tar')
         self.aa.reset_collection()
         self.assertEqual(self.aa.source_images, [])
 
