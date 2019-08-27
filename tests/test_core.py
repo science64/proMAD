@@ -84,9 +84,9 @@ class LoadFromFile(unittest.TestCase):
         cases = Path(__file__).absolute().resolve().parent / 'cases'
         aa = ArrayAnalyse.load(cases / 'save' / 'dump.tar')
         self.assertEqual(hash_array(aa.foregrounds),
-                         'cc98f2cee0d56857b602da8bcc8e19c844059fef00c680358590a6d6e5525ee3')
+                         '993f84db0f1211cfd9859571e9d1db8dc2443d179c5199c60fd3774057f27f0f')
         self.assertEqual(hash_array(aa.raw_images),
-                         '95eb787549115f76ddba215c271fe8b31060c8ed6e3bc6685e3f62049c37c12f')
+                         '46ee47b580e20c10cd9c50c598944929887f41a86f64ecca8071085ae5dde93c')
 
 
 class TestArrays(unittest.TestCase):
@@ -171,7 +171,7 @@ class LoadImages(TestARY022B):
             self.assertEqual(len(w), 1)
             self.assertEqual(w[-1].category, RuntimeWarning)
             self.assertIn("Data is already finalized.", str(w[-1].message))
-
+        self.aa.save('/Users/nathan/Documents/projects/proMAD/tests/cases/save/dump.tar')
         self.aa.reset_collection()
         self.assertEqual(self.aa.source_images, [])
 
