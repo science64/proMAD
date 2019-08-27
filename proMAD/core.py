@@ -430,7 +430,8 @@ class ArrayAnalyse(object):
         file_system = True
         if isinstance(file, os.PathLike) or isinstance(file, str):
             self.verbose_print(f'Load image: {file}')
-            source_image = ski_io.imread(Path(file).absolute(), plugin='imageio')
+            file = Path(file)
+            source_image = ski_io.imread(file.absolute(), plugin='imageio')
             suffix = file.suffix.lower()
 
         elif isinstance(file, (io.RawIOBase, io.BufferedIOBase)):
@@ -668,8 +669,7 @@ class ArrayAnalyse(object):
         Returns
         -------
         dict
-            Dictionary with the three data sets for the requested spot. ('raw', 'background', 'raw')
-
+            Dictionary with the three data sets for the requested spot. ('foreground', 'background', 'raw')
 
         """
 
@@ -977,6 +977,71 @@ class ArrayAnalyse(object):
                 image = plt.cm.gist_ncar(image)[:, :, :3]
                 image = img_as_ubyte(image)
                 ski_io.imsave(file_path, image)
+
+    def align_test(self, kind='raw', file=None, example=-1, max_size=None):
+        """
+        Build the array from the extracted spots in a chess pattern to check alignment.
+
+        Parameters
+        ----------
+        kind: str
+            raw: raw content; bg: background; fg: foreground
+        file:
+            file can be a path to a file (a string), a file-like object or a path-like object;
+            if file is None result is directly shown
+        example: int
+            which image to use
+        max_size: int
+            size of the longest edge in pixel
+        """
+
+        if not self.is_finalized:
+            warnings.warn('Data collection needs to be finalized to plot the contact sheet.', RuntimeWarning)
+            return None
+
+        x_num = sum(self.array_data['net_layout_x'])
+        y_num = sum(self.array_data['net_layout_y'])
+        x_length = sum(self.array_data['net_layout_x']) * config.scale
+        y_length = sum(self.array_data['net_layout_y']) * config.scale
+        align_image = np.zeros((y_length, x_length))
+        data_match = {'raw': 'raw', 'fg': 'foreground', 'bg': 'background'}
+        image_match = {'raw': 'raw_images', 'fg': 'foregrounds', 'bg': 'backgrounds'}
+        full_image = np.log(getattr(self, image_match[kind]) + 0.1)
+        min_full, max_full = np.min(full_image), np.max(full_image)
+        for x in range(y_num):
+            for y in range(x_num):
+                spot = (self.get_spot((x, y))[data_match[kind]])[:, :, example]
+                spot = np.log(spot + 0.1)
+                spot = ((spot - min_full) * (1 / (max_full - min_full)))
+
+                x_pos = [x * config.scale, (x + 1) * config.scale]
+                y_pos = [y * config.scale, (y + 1) * config.scale]
+                if (x+y) % 2:
+                    align_image[x_pos[0]:x_pos[1], y_pos[0]:y_pos[1]] = spot
+                else:
+                    align_image[x_pos[0]:x_pos[1], y_pos[0]:y_pos[1]] = invert(spot)
+
+        if file is None:
+            fig, ax = plt.subplots()
+            ax.set_title(f'Align test {kind}')
+            ax.imshow(align_image, interpolation='nearest', cmap=plt.cm.CMRmap, vmin=0, vmax=1)
+            ax.axes.get_xaxis().set_visible(False)
+            ax.axes.get_yaxis().set_visible(False)
+            fig.show()
+
+        else:
+            image = plt.cm.CMRmap(align_image)[:, :, :3]
+            if max_size:
+                factor = max_size / np.max(image.shape)
+                if factor < 1:
+                    image = rescale(image, factor)
+
+            image = img_as_ubyte(image)
+            if isinstance(file, os.PathLike) or isinstance(file, str):
+                ski_io.imsave(str(Path(file).absolute()), image)
+            elif isinstance(file, (io.RawIOBase, io.BufferedIOBase)):
+                im = Image.fromarray(image)
+                im.save(file, format='JPEG')
 
     def contact_sheet(self, kind='raw', file=None, max_size=None):
         """

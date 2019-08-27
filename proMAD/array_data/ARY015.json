@@ -5,7 +5,7 @@
   "source": "https://resources.rndsystems.com/pdfs/datasheets/ary015.pdf",
   "created": "2019-07-24 11:21:18.968299",
   "id": "ARY015",
-  "net_skip_size": 0.6666666666666666,
+  "net_skip_size": 0.5,
   "net_layout_x": [
     2, 4, 4, 4, 4, 4
   ],
