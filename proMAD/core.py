@@ -542,9 +542,16 @@ class ArrayAnalyse(object):
         y = np.array(y)
 
         # TODO: use array_data to generate the initial guesses
-        ref_1_guess = (min(x), min(y))
-        ref_2_guess = (min(x), max(y))
-        ref_3_guess = (max(x), min(y))
+
+        # try/except if no contours could be found
+        try:
+            ref_1_guess = (min(x), min(y))
+            ref_2_guess = (min(x), max(y))
+            ref_3_guess = (max(x), min(y))
+        except ValueError:
+            self.verbose_print(
+                '\tImage skipped - position guess failed - not enough contours found.')
+            return None
 
         ref_1_idx = np.argsort((x - ref_1_guess[0]) ** 2 + (y - ref_1_guess[1]) ** 2)[0]
         ref_2_idx = np.argsort((x - ref_2_guess[0]) ** 2 + (y - ref_2_guess[1]) ** 2)[0]
