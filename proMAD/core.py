@@ -929,20 +929,35 @@ class ArrayAnalyse(object):
             align_img = plt.cm.nipy_spectral(align_img)
             ski_io.imsave(str(Path(file_name).absolute()), align_img)
 
-    def control_reac_fit(self, position, c_enzyme=None, file_name=None):
-        spot = self.get_spot(position)
-        y_raw = self.evaluate_spots_raw_bg_corrected(spot)
-        if c_enzyme is None:
-            c_enzyme = self.evaluate_spot_reac(spot)[0]
-        self.verbose_print(c_enzyme)
-        y = []
-        for t in self.exposure:
-            y.append(self.light_reaction(t, c_enzyme))
+    def control_reac_fit(self, count=None, c_enzyme=None, file_name=None):
+        if count is None:
+            count = self.kappa_fit_count
+
+        selection = []
+        for entry in self.array_data['spots']:
+            spot = self.get_spot(entry['position'])
+            selection.append((entry['position'], np.max(spot['raw'])))
+        fit_selection = [entry[0] for entry in sorted(selection, key=lambda x: x[1], reverse=True)[:count]]
 
         fig, ax = plt.subplots()
-        ax.set_title(f'Reaction fit spot {position} [{c_enzyme:.3e}]')
-        ax.scatter(self.exposure, y_raw)
-        ax.plot(self.exposure, y, c='red')
+        ax.set_title(f'Reaction fit')
+        plot_out = [np.array(self.exposure)/60.0]
+        for position in fit_selection:
+            spot = self.get_spot(position)
+            y_raw = self.evaluate_spots_raw_bg_corrected(spot)
+            c_enzyme = self.evaluate_spot_reac(spot)[0]
+            self.verbose_print(c_enzyme)
+            y = []
+            for t in self.exposure:
+                y.append(self.light_reaction(t, c_enzyme))
+            ax.plot(self.exposure, y, c='red')
+            plot_out.append(y)
+            ax.scatter(self.exposure, y_raw)
+            plot_out.append(y_raw)
+
+        for data in zip(*plot_out):
+            print(' '.join([f'{v:.5f}' for v in data]))
+
         if file_name is None:
             fig.show()
 
