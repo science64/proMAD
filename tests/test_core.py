@@ -288,27 +288,6 @@ class LoadCollection(TestARY022BCollection):
                          'eff29a8d43c76e929d09e90dc7f1cbf2679d5ea73fc5762b3d71ff65c4a29f54')
         shutil.rmtree(out_folder)
 
-    def test_report_excel(self):
-
-        compare = {'xl/worksheets/sheet1.xml': 'a12d8aead0e6cdf7b727ef7ce870422ae5e7943311354e628504b95c167f82c0',
-                   'xl/worksheets/sheet2.xml': '6f600b648a13fbd3e4ad2e6dbeefa6dc24a9488637a4c6caca1292a18ccc4eeb',
-                   'xl/charts/chart1.xml': 'b636178594bf6a5e27e31de127d79ab7bebb51b8b66f14b6f3489732a0a1cf4d'}
-
-        save_mem = io.BytesIO()
-        report.report_excel(self.aa, file=save_mem, norm='reac')
-        zf = ZipFile(save_mem)
-        for fn, c_hash in compare.items():
-            self.assertEqual(hash_bytes(zf.read(fn)), c_hash)
-
-        out_folder = self.cases / 'test_report'
-        out_folder.mkdir(exist_ok=True, parents=True)
-        report.report_excel(self.aa, file=out_folder / 'test.xlsx', norm='reac')
-        zf = ZipFile(out_folder / 'test.xlsx')
-
-        for fn, c_hash in compare.items():
-            self.assertEqual(hash_bytes(zf.read(fn)), c_hash)
-        shutil.rmtree(out_folder)
-
 
 if __name__ == '__main__':
     unittest.main()
