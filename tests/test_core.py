@@ -5,8 +5,10 @@ import sys
 import unittest
 import warnings
 from pathlib import Path
+from zipfile import ZipFile
 
 from proMAD import ArrayAnalyse
+from proMAD import report
 
 
 def get_stdout(func, args=(), kwargs=None):
@@ -20,13 +22,13 @@ def get_stdout(func, args=(), kwargs=None):
     return captured_output.getvalue()
 
 
-def hash_file(path):
+def hash_file(path, skip=16):
     path = Path(path)
     file_hash = hashlib.sha3_256()
     with path.open('rb') as stream:
         # skip ahead to avoid false positives caused by
         # the timestamp in the header
-        stream.seek(16*1024)
+        stream.seek(skip*1024)
         while True:
             data = stream.read(64*1024)
             if not data:
@@ -35,14 +37,19 @@ def hash_file(path):
     return file_hash.hexdigest()
 
 
-def hash_mem(mem):
-    mem.seek(16 * 1024)
+def hash_mem(mem, skip=16):
+    mem.seek(skip * 1024)
     mem_hash = hashlib.sha3_256(mem.read())
     return mem_hash.hexdigest()
 
 
 def hash_array(array):
     array_hash = hashlib.sha3_256(array.tobytes())
+    return array_hash.hexdigest()
+
+
+def hash_bytes(b):
+    array_hash = hashlib.sha3_256(b)
     return array_hash.hexdigest()
 
 
@@ -80,6 +87,7 @@ class TestARY022BCollection(unittest.TestCase):
 
 
 class LoadFromFile(unittest.TestCase):
+
     def test_load(self):
         cases = Path(__file__).absolute().resolve().parent / 'cases'
         aa = ArrayAnalyse.load(cases / 'save' / 'dump.tar')
@@ -98,7 +106,7 @@ class TestArrays(unittest.TestCase):
         aa.load_image(self.cases / 'ARY007.tif')
         aa.finalize_collection()
         save_mem = io.BytesIO()
-        aa.align_test(file=save_mem)
+        aa.figure_alignment(file=save_mem)
         self.assertEqual(hash_mem(save_mem),
                          '991c54036fd3a11cf5a8763c0a8cd8fe0638415df4bc84392bb15da6daeacc78')
 
@@ -108,7 +116,7 @@ class TestArrays(unittest.TestCase):
         aa.load_image(self.cases / 'ARY015.tif')
         aa.finalize_collection()
         save_mem = io.BytesIO()
-        aa.align_test(file=save_mem)
+        aa.figure_alignment(file=save_mem)
         self.assertEqual(hash_mem(save_mem),
                          '95ac01b73c0714c2d39571deadc8e569e2fab5ca17e530df5086890d86c1b390')
 
@@ -118,7 +126,7 @@ class TestArrays(unittest.TestCase):
         aa.load_image(self.cases / 'ARY028.tif')
         aa.finalize_collection()
         save_mem = io.BytesIO()
-        aa.align_test(file=save_mem)
+        aa.figure_alignment(file=save_mem)
         self.assertEqual(hash_mem(save_mem),
                          '3573ce7aad79c56d098c99bb8523def6fc1f670068c72624af4d75bfa5abe7fb')
 
@@ -192,10 +200,19 @@ class LoadCollection(TestARY022BCollection):
                       'value': (0.9603999914272608, 8.169726417758122e-05, 0.9997357674683341)}
         compare_206 = {'position': [9, 0], 'info': ['Reference Spots', 'N/A', 'RS'],
                        'value': (3.7074421357106, -0.017640873154213907, 0.9996119545117066)}
-
+        print(data[11], data[206])
         for i in range(3):
             self.assertAlmostEqual(data[11]['value'][i], compare_11['value'][i], places=7)
             self.assertAlmostEqual(data[206]['value'][i], compare_206['value'][i], places=7)
+
+    def test_evaluate_double_spot(self):
+        data = self.aa.evaluate(double_spot=True)
+        compare_11 = {'position': [0, 22], 'info': ['Reference Spots', None, 'RS'], 'value': 3.2279057930907777}
+        compare_100 = {'position': [8, 16], 'info': ['TNF-α', '7124', 'TNFSF1A'], 'value': 0.9304401202054406}
+
+        for i in range(3):
+            self.assertAlmostEqual(data[11]['value'], compare_11['value'], places=7)
+            self.assertAlmostEqual(data[100]['value'], compare_100['value'], places=7)
 
     def test_reac(self):
         compare_reac = {'position': (0, 0), 'info': ['Reference Spots', 'N/A', 'RS'],
@@ -247,13 +264,13 @@ class LoadCollection(TestARY022BCollection):
 
     def test_contact_sheet(self):
         contact_sheet_mem = io.BytesIO()
-        self.aa.contact_sheet(file=contact_sheet_mem)
+        self.aa.figure_contact_sheet(file=contact_sheet_mem)
         self.assertEqual(hash_mem(contact_sheet_mem),
                          'a20deb0027988e5fbd645278a497f965390d5ad2e1555dc15600a24a1fc54a54')
 
         out_folder = self.cases / 'test_contact_sheet'
         out_folder.mkdir(exist_ok=True, parents=True)
-        self.aa.contact_sheet(file=out_folder / 'contact_sheet.png', max_size=500)
+        self.aa.figure_contact_sheet(file=out_folder / 'contact_sheet.png', max_size=500)
         self.assertEqual(hash_file(out_folder / 'contact_sheet.png'),
                          '9c348336b772c1d68e81ba558d2174c7b52d93ca9d7d10364168693cd9288f7c')
         shutil.rmtree(out_folder)
@@ -269,6 +286,27 @@ class LoadCollection(TestARY022BCollection):
         self.aa.save(out_folder / 'dump.tar')
         self.assertEqual(hash_file(out_folder / 'dump.tar'),
                          'eff29a8d43c76e929d09e90dc7f1cbf2679d5ea73fc5762b3d71ff65c4a29f54')
+        shutil.rmtree(out_folder)
+
+    def test_report_excel(self):
+
+        compare = {'xl/worksheets/sheet1.xml': 'a12d8aead0e6cdf7b727ef7ce870422ae5e7943311354e628504b95c167f82c0',
+                   'xl/worksheets/sheet2.xml': '6f600b648a13fbd3e4ad2e6dbeefa6dc24a9488637a4c6caca1292a18ccc4eeb',
+                   'xl/charts/chart1.xml': 'b636178594bf6a5e27e31de127d79ab7bebb51b8b66f14b6f3489732a0a1cf4d'}
+
+        save_mem = io.BytesIO()
+        report.report_excel(self.aa, file=save_mem, norm='reac')
+        zf = ZipFile(save_mem)
+        for fn, c_hash in compare.items():
+            self.assertEqual(hash_bytes(zf.read(fn)), c_hash)
+
+        out_folder = self.cases / 'test_report'
+        out_folder.mkdir(exist_ok=True, parents=True)
+        report.report_excel(self.aa, file=out_folder / 'test.xlsx', norm='reac')
+        zf = ZipFile(out_folder / 'test.xlsx')
+
+        for fn, c_hash in compare.items():
+            self.assertEqual(hash_bytes(zf.read(fn)), c_hash)
         shutil.rmtree(out_folder)
 
 

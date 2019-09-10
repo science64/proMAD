@@ -10,8 +10,6 @@ import tarfile
 
 import matplotlib.pyplot as plt
 import numpy as np
-from openpyxl import Workbook
-from openpyxl.utils import get_column_letter
 from scipy import stats
 from scipy.optimize import curve_fit, minimize_scalar
 from skimage import io as ski_io
@@ -20,13 +18,13 @@ from skimage import measure
 from skimage import transform
 from skimage.color import rgb2gray
 from skimage.external import tifffile
-from skimage.filters import threshold_otsu
 from skimage.morphology import reconstruction
 from skimage.transform import rotate, rescale
 from skimage.util import invert
 from PIL import Image
 
 from . import config
+from .report import report_excel
 
 
 class ArrayAnalyse(object):
@@ -53,7 +51,8 @@ class ArrayAnalyse(object):
 
     - `aa.test_warp_length_ration`: deviation from the x/y ratio (0.1)
     - `aa.test_warp_angle`: deviation from the angle in radians (0.05)
-    - `aa.test_warp_distance`: allowed (distance/short edge) between guessed anchor positions and nearest found contour (0.275)
+    - `aa.test_warp_distance`: allowed (distance/short edge) between guessed anchor
+       positions and nearest found contour (0.275)
     - `aa.test_quality_resolution`: minimal used portion of the brightness spectra (0.1)
     - `aa.test_quality_exposure`: maximal allowed number of full exposed pixels (1)
 
@@ -218,6 +217,15 @@ class ArrayAnalyse(object):
             print(f'\tSource: {array["source"]}\n')
 
     def save(self, file):
+        """
+        Saves the finalized content of an ArrayAnalyse instant into a .tar file
+
+        Parameters
+        ----------
+        file:
+            can be a path to a file (a string), a path-like object, or a file-like object
+
+        """
         if not self.is_finalized:
             warnings.warn('Data collection needs to be finalized to save.', RuntimeWarning)
             return None
@@ -252,7 +260,7 @@ class ArrayAnalyse(object):
         elif isinstance(file, (io.RawIOBase, io.BufferedIOBase)):
             tar = tarfile.open(fileobj=file, mode="w")
         else:
-            raise TypeError(f'Type {type(file)} not supported for save.')
+            raise TypeError(f'Type {type(file)} not supported to save the data.')
 
         base = json.dumps(base_data).encode("utf-8")
         ti = tarfile.TarInfo("base.json")
@@ -268,6 +276,19 @@ class ArrayAnalyse(object):
 
     @classmethod
     def load(cls, file):
+        """
+        Load the content of a saved ArrayAnalyse instant from file
+
+        Parameters
+        ----------
+        file:
+            can be a path to a file (a string), a path-like object, or a file-like object
+
+        Returns
+        -------
+        ArrayAnalyse
+            returns a ArrayAnalyse instance
+        """
         if isinstance(file, os.PathLike) or isinstance(file, str):
             tar = tarfile.TarFile.open(file)
         elif isinstance(file, (io.RawIOBase, io.BufferedIOBase)):
@@ -281,7 +302,7 @@ class ArrayAnalyse(object):
             if member.name == "data.npz":
                 data = np.load(tar.extractfile(member))
         if not cls._compare_version(config.allowed_load_version, base_data['version']):
-            raise TypeError(f'Save file from version {".".join(base_data["version"])} can not be loaded')
+            raise TypeError(f'Save file from version {".".join(base_data["version"])} cannot be loaded')
         aa = cls(base_data['array_type'], silent=base_data['silent'])
         for name in aa.save_list_base:
             setattr(aa, name, base_data[name])
@@ -358,7 +379,8 @@ class ArrayAnalyse(object):
     def finalize_collection(self):
         """
         Orders the image collections and convert them into numpy arrays.
-        The ordering is either derived from the background intensity extracted from a histogram or exposure time in image meta data.
+        The ordering is either derived from the background intensity extracted
+        from a histogram or exposure time in the image metadata.
 
         """
         if self.is_finalized:
@@ -403,10 +425,10 @@ class ArrayAnalyse(object):
             self.minimize_kappa()
 
         if self.debug == 'plot':
-            self.control_alignment()
-            self.contact_sheet()
+            self.figure_alignment()
+            self.figure_contact_sheet()
 
-    def load_image(self, file, rotation=None, suffix=None, meta_data = None):
+    def load_image(self, file, rotation=None, suffix=None, meta_data=None):
         """
         Load a single image file into the collection.
 
@@ -414,7 +436,7 @@ class ArrayAnalyse(object):
         Parameters
         ----------
         file:
-            file can be a path to a file (a string or path-like object), a file-like object or a numpy ndarray;
+            file can be a path to a file (a string or path-like object), a file-like object, or a numpy ndarray;
             if file is None result is directly shown
         rotation: int or float
             apply a rotation to the images
@@ -459,7 +481,8 @@ class ArrayAnalyse(object):
                         pass
 
         if source_image.ndim == 3:
-            warnings.warn("Load RGB image. Converting to greyscale alters the result. Use raw greyscale if possible.", RuntimeWarning)
+            warnings.warn("Load RGB image. Converting to greyscale alters the result. Use raw greyscale if possible.",
+                          RuntimeWarning)
             source_image = rgb2gray(source_image)
             # if min value is black invert image
             if np.average(source_image) > np.max(source_image)//2:
@@ -506,7 +529,7 @@ class ArrayAnalyse(object):
 
     def warp_image(self, image, rotation=None):
         """
-        Warp image into an defined shape based on a contour search.
+        Warp images into a defined shape based on a contour search.
 
 
         Parameters
@@ -563,7 +586,7 @@ class ArrayAnalyse(object):
         length_test = (x_length_test/y_length_test) / (x_length/y_length)
 
         angle_test = self._angle_between(np.array([x[ref_3_idx] - x[ref_1_idx], y[ref_3_idx] - y[ref_1_idx]]),
-                                   np.array([x[ref_2_idx] - x[ref_1_idx], y[ref_2_idx] - y[ref_1_idx]]))/np.pi*2
+                                         np.array([x[ref_2_idx] - x[ref_1_idx], y[ref_2_idx] - y[ref_1_idx]]))/np.pi*2
 
         dis_1 = np.min(np.sqrt((x - ref_1_guess[0]) ** 2 + (y - ref_1_guess[1]) ** 2))
         dis_2 = np.min(np.sqrt((x - ref_2_guess[0]) ** 2 + (y - ref_2_guess[1]) ** 2))
@@ -590,9 +613,11 @@ class ArrayAnalyse(object):
             self.verbose_print(f'\tguess distance: {self._failed_passed(not (np.isnan(dis_test)) and not (dis_test > self.test_warp_distance))} ({dis_test:.4f})')
 
         if self.strict:
-            if np.isnan(length_test) or np.isnan(angle_test) or np.isnan(dis_test) or abs(length_test-1.0) > self.test_warp_length_ration or abs(angle_test-1.0) > self.test_warp_angle or dis_test > self.test_warp_distance:
+            if (np.isnan(length_test) or np.isnan(angle_test) or np.isnan(dis_test)
+                    or abs(length_test-1.0) > self.test_warp_length_ration
+                    or abs(angle_test-1.0) > self.test_warp_angle or dis_test > self.test_warp_distance):
                 self.verbose_print('\tImage skipped - position guess failed - image maybe not rotated correctly at %i degrees,\n'
-                      '\t\tor the contrast is not good enough for the feature extraction.' % rotation)
+                                   '\t\tor the contrast is not good enough for the feature extraction.' % rotation)
                 return None
 
         # define the reference spots locations and transform the image
@@ -611,7 +636,7 @@ class ArrayAnalyse(object):
     @staticmethod
     def background_histogram(raw_image, full=False):
         """
-        Generate histogram and find background split parameter
+        Generate the histogram and find background split parameter
 
         Parameters
         ----------
@@ -752,7 +777,7 @@ class ArrayAnalyse(object):
 
     def minimize_kappa(self):
         """
-        Finds the optimal kappa for a subset of `kappa_fit_count` numbers of brightest spots.
+        Finds the optimal kappa for a subset of `kappa_fit_count` numbers of the brightest spots.
 
         """
         selection = []
@@ -812,10 +837,10 @@ class ArrayAnalyse(object):
         -----
         You can select between different evaluation modes, by setting `norm`.
 
-        - raw: list of averages for all timesteps based on the original image
+        - raw: list of averages for all time-steps based on the original image
         - raw_bg: as raw but reduced by the histogram based background value
-        - local_bg: mean of the ratios between the original images and the extracted backgrounds
-        - hist_fg: linear correlation between background (histogramm) evolution to the average forground value
+        - local_bg: mean of the ratios between the original images, and the extracted backgrounds
+        - hist_fg: linear correlation between background (histogram) evolution to the average forground value
         - hist_raw: as hist_fg but compared to the original image
         - reac: estimate of the catalytic enzyme concentration
 
@@ -833,6 +858,8 @@ class ArrayAnalyse(object):
             evaluation strategy selection
         just_value: bool
         double_spot: bool
+            if True and no position is given double spots will be averaged
+            if a specific position is given both values will be returned
 
         Returns
         -------
@@ -867,19 +894,29 @@ class ArrayAnalyse(object):
             for entry in self.array_data['spots']:
                 spot = self.get_spot(entry['position'])
                 value = evaluate_spots(spot)
-                if just_value:
-                    data.append(value[0])
-                else:
-                    data.append(dict(position=entry['position'], info=entry['info'], value=value))
                 if 'double_spot' in self.array_data:
-                    spot = self.get_spot(entry['position'], double=self.array_data['double_spot'])
-                    value = evaluate_spots(spot)
+                    ds_spot = self.get_spot(entry['position'], double=self.array_data['double_spot'])
+                    ds_value = evaluate_spots(ds_spot)
+                    if just_value:
+                        if double_spot:
+                            data.append(float((value[0] + ds_value[0])/2))
+                        else:
+                            data.append(float(value[0]))
+                            data.append(float(ds_value[0]))
+                    else:
+                        if double_spot:
+                            data.append(dict(position=entry['position'], info=entry['info'],
+                                             value=float((value[0]+ds_value[0])/2)))
+                        else:
+                            data.append(dict(position=entry['position'], info=entry['info'], value=value))
+                            position = [entry['position'][0] + self.array_data['double_spot'][0],
+                                        entry['position'][1] + self.array_data['double_spot'][1]]
+                            data.append(dict(position=position, info=entry['info'], value=ds_value))
+                else:
                     if just_value:
                         data.append(value[0])
                     else:
-                        position = [entry['position'][0] + self.array_data['double_spot'][0],
-                                    entry['position'][1] + self.array_data['double_spot'][1]]
-                        data.append(dict(position=position, info=entry['info'], value=value))
+                        data.append(dict(position=entry['position'], info=entry['info'], value=value))
 
         else:
             position = self.get_position_coordinates(position)
@@ -911,25 +948,19 @@ class ArrayAnalyse(object):
 
         return data
 
-    def control_alignment(self, file_name=None):
-        if not self.is_finalized:
-            warnings.warn('Data collection needs to be finalized to plot the alignment data.', RuntimeWarning)
-            return None
-        align_img = np.zeros(self.raw_images[:, :, 0].shape)
-        for i in range(self.raw_images.shape[2]):
-            thresh = threshold_otsu(self.raw_images[:, :, i])
-            align_img += self.raw_images[:, :, i] > thresh
-        align_img /= self.raw_images.shape[2]
-        if file_name is None:
-            fig, ax = plt.subplots()
-            ax.set_title('Alignment check')
-            ax.imshow(align_img,  interpolation='nearest', cmap=plt.cm.nipy_spectral)
-            fig.show()
-        else:
-            align_img = plt.cm.nipy_spectral(align_img)
-            ski_io.imsave(str(Path(file_name).absolute()), align_img)
+    def figure_reaction_fit(self, file=None, count=None):
+        """
+        Combine an array time series into an overview image.
 
-    def control_reac_fit(self, count=None, c_enzyme=None, file_name=None):
+        Parameters
+        ----------
+        file:
+            file can be a path to a file (a string), a file-like object, or a path-like object (default svg);
+            if file is None result is directly shown
+        count: int
+            number of the brightest spots to include in the plot
+        """
+
         if count is None:
             count = self.kappa_fit_count
 
@@ -940,8 +971,9 @@ class ArrayAnalyse(object):
         fit_selection = [entry[0] for entry in sorted(selection, key=lambda x: x[1], reverse=True)[:count]]
 
         fig, ax = plt.subplots()
-        ax.set_title(f'Reaction fit')
-        plot_out = [np.array(self.exposure)/60.0]
+        ax.set_title(r'Determine $\kappa$')
+        ax.set_ylabel('light flux $L$')
+        ax.set_xlabel('exposure time $t$ (min)')
         for position in fit_selection:
             spot = self.get_spot(position)
             y_raw = self.evaluate_spots_raw_bg_corrected(spot)
@@ -950,59 +982,18 @@ class ArrayAnalyse(object):
             y = []
             for t in self.exposure:
                 y.append(self.light_reaction(t, c_enzyme))
-            ax.plot(self.exposure, y, c='red')
-            plot_out.append(y)
-            ax.scatter(self.exposure, y_raw)
-            plot_out.append(y_raw)
+            ax.plot(self.exposure/60, y, c='black')
+            ax.scatter(self.exposure/60, y_raw, c='#469DFF', s=3, zorder=5)
 
-        for data in zip(*plot_out):
-            print(' '.join([f'{v:.5f}' for v in data]))
-
-        if file_name is None:
+        if file is None:
             fig.show()
+        else:
+            if isinstance(file, os.PathLike) or isinstance(file, str):
+                fig.savefig(file)
+            elif isinstance(file, (io.RawIOBase, io.BufferedIOBase)):
+                fig.savefig(file, format='svg')
 
-    def contact_sheet_spot(self, position, file_name=None):
-        spot = self.get_spot(position)
-        pad = 2
-        sx, sy, spot_count = spot['raw'].shape
-        y_count = int(np.ceil(np.sqrt(spot_count)))
-        x_count = int(np.ceil(spot_count / y_count))
-        y_max = int(y_count * sy + (y_count - 1) * pad)
-        x_max = int(x_count * sx + (x_count - 1) * pad)
-
-        css_raw = np.ones((x_max, y_max))
-        css_fg = np.ones((x_max, y_max))
-        css_bg = np.ones((x_max, y_max))
-        for x_c in range(x_count):
-            for y_c in range(y_count):
-                x = x_c * pad + x_c * sx
-                y = y_c * pad + y_c * sy
-                try:
-                    css_raw[x:x + sx, y:y + sy] = spot['raw'][:, :, x_c * y_count + y_c]
-                    css_bg[x:x + sx, y:y + sy] = spot['background'][:, :, x_c * y_count + y_c]
-                    css_fg[x:x + sx, y:y + sy] = spot['foreground'][:, :, x_c * y_count + y_c]
-                except IndexError:
-                    pass
-
-        for name, image in (('raw', css_raw), ('foreground', css_fg), ('background', css_bg)):
-            if file_name is None:
-                fig, ax = plt.subplots()
-                ax.set_title(f'Contact spot sheet {name}')
-                ax.imshow(image, interpolation='nearest')
-                ax.axes.get_xaxis().set_visible(False)
-                ax.axes.get_yaxis().set_visible(False)
-                fig.show()
-
-            else:
-                file_name = Path(file_name)
-                suffix = file_name.suffix
-                f_name = file_name.with_suffix('').name
-                file_path = str(file_name.with_name(f_name+'_' + name).with_suffix(suffix).absolute())
-                image = plt.cm.gist_ncar(image)[:, :, :3]
-                image = img_as_ubyte(image)
-                ski_io.imsave(file_path, image)
-
-    def align_test(self, kind='raw', file=None, example=-1, max_size=None):
+    def figure_alignment(self, kind='raw', file=None, example=-1, max_size=None):
         """
         Build the array from the extracted spots in a chess pattern to check alignment.
 
@@ -1011,12 +1002,12 @@ class ArrayAnalyse(object):
         kind: str
             raw: raw content; bg: background; fg: foreground
         file:
-            file can be a path to a file (a string), a file-like object or a path-like object;
+            file can be a path to a file (a string), a file-like object, or a path-like object;
             if file is None result is directly shown
         example: int
-            which image to use
+            what image to use
         max_size: int
-            size of the longest edge in pixel
+            size of the longest edge in pixels
         """
 
         if not self.is_finalized:
@@ -1067,19 +1058,19 @@ class ArrayAnalyse(object):
                 im = Image.fromarray(image)
                 im.save(file, format='JPEG')
 
-    def contact_sheet(self, kind='raw', file=None, max_size=None):
+    def figure_contact_sheet(self, kind='raw', file=None, max_size=None):
         """
-        Combine a array time series into an overview image.
+        Combine an array time series into an overview image.
 
         Parameters
         ----------
         kind: str
             raw: raw content; bg: background; fg: foreground
         file:
-            file can be a path to a file (a string), a file-like object or a path-like object;
+            file can be a path to a file (a string), a file-like object, or a path-like object;
             if file is None result is directly shown
         max_size: int
-            size of the longest edge in pixel
+            size of the longest edge in pixels
         """
         if not self.is_finalized:
             warnings.warn('Data collection needs to be finalized to plot the contact sheet.', RuntimeWarning)
@@ -1098,7 +1089,8 @@ class ArrayAnalyse(object):
                 x = x_c * pad + x_c * self.raw_images.shape[0]
                 y = y_c * pad + y_c * self.raw_images.shape[1]
                 try:
-                    image[x:x + self.raw_images.shape[0], y:y + self.raw_images.shape[1]] = getattr(self, data_match[kind])[:, :, x_c * y_count + y_c]
+                    image[x:x + self.raw_images.shape[0], y:y + self.raw_images.shape[1]] = (
+                        getattr(self, data_match[kind])[:, :, x_c * y_count + y_c])
                 except IndexError:
                     pass
 
@@ -1127,28 +1119,68 @@ class ArrayAnalyse(object):
                 im = Image.fromarray(image)
                 im.save(file, format='JPEG')
 
-    def report(self, file_path, norm='hist_raw', report_type='xlsx'):
-        if not self.is_finalized:
-            warnings.warn('Data collection needs to be finalized to generate a report.', RuntimeWarning)
-            return None
-        wb = Workbook()
-        ws = wb.create_sheet()
-        ws.title = "Results"
-        data = self.evaluate(norm=norm)
-        row_offset = 3
-        column_offset = 2
-        for entry in data:
-            if entry['value'] is float:
-                ws.cell(column=entry['position'][1]+column_offset, row=entry['position'][0]+row_offset,
-                        value=round(entry['value'], 2))
-            else:
-                ws.cell(column=entry['position'][1] + column_offset, row=entry['position'][0] + row_offset,
-                        value=round(entry['value'][0], 2))
+    def figure_contact_sheet_spot(self, position, kind='raw', file=None, max_size=None):
+        """
+        Combine an array time series into an overview image.
 
-        for column in range(sum(self.array_data['net_layout_x'])):
-            ws.cell(column=column + column_offset, row=row_offset - 1, value=column+1)
+        Parameters
+        ----------
+        position: str or (int, int)
+            position string  ('A6', 'C4', ...) or coordinates
+        kind: str
+            raw: raw content; bg: background; fg: foreground
+        file:
+            file can be a path to a file (a string), a file-like object, or a path-like object;
+            if file is None result is directly shown
+        max_size: int
+            size of the longest edge in pixels
+        """
 
-        for row in range(sum(self.array_data['net_layout_y'])):
-            ws.cell(column=column_offset - 1, row=row + row_offset, value=get_column_letter(row+1))
+        data_match = {'raw': 'raw', 'fg': 'foreground', 'bg': 'background'}
 
-        wb.save(file_path)
+        spot = self.get_spot(position)
+        pad = 2
+        sx, sy, spot_count = spot['raw'].shape
+        y_count = int(np.ceil(np.sqrt(spot_count)))
+        x_count = int(np.ceil(spot_count / y_count))
+        y_max = int(y_count * sy + (y_count - 1) * pad)
+        x_max = int(x_count * sx + (x_count - 1) * pad)
+
+        css = np.ones((x_max, y_max))
+        for x_c in range(x_count):
+            for y_c in range(y_count):
+                x = x_c * pad + x_c * sx
+                y = y_c * pad + y_c * sy
+                try:
+                    css[x:x + sx, y:y + sy] = spot[data_match[kind]][:, :, x_c * y_count + y_c]
+                except IndexError:
+                    pass
+
+        image = np.log(css + 0.1)
+        image = ((image - np.min(image)) * (1 / (np.max(image) - np.min(image))))
+
+        if file is None:
+            fig, ax = plt.subplots()
+            ax.set_title(f'Contact spot sheet ({data_match[kind]})')
+            ax.imshow(image, interpolation='nearest', cmap=plt.cm.CMRmap_r, vmin=0, vmax=1)
+            ax.axes.get_xaxis().set_visible(False)
+            ax.axes.get_yaxis().set_visible(False)
+            fig.show()
+
+        else:
+            image = plt.cm.CMRmap_r(image)[:, :, :3]
+            if max_size:
+                factor = max_size / np.max(image.shape)
+                if factor < 1:
+                    image = rescale(image, factor)
+
+            image = img_as_ubyte(image)
+            if isinstance(file, os.PathLike) or isinstance(file, str):
+                ski_io.imsave(str(Path(file).absolute()), image)
+            elif isinstance(file, (io.RawIOBase, io.BufferedIOBase)):
+                im = Image.fromarray(image)
+                im.save(file, format='JPEG')
+
+    def report(self, file=None, norm='hist_raw', report_type='xlsx'):
+        if report_type == 'xlsx':
+            report_excel(aa=self, file=file, norm=norm)
