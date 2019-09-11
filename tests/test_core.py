@@ -1,56 +1,13 @@
-import hashlib
 import io
 import shutil
-import sys
 import unittest
 import warnings
 from pathlib import Path
-from zipfile import ZipFile
 
 from proMAD import ArrayAnalyse
-from proMAD import report
 
-
-def get_stdout(func, args=(), kwargs=None):
-    if kwargs is None:
-        kwargs = {}
-    old_state = sys.stdout
-    captured_output = io.StringIO()
-    sys.stdout = captured_output
-    func(*args, **kwargs)
-    sys.stdout = old_state
-    return captured_output.getvalue()
-
-
-def hash_file(path, skip=16):
-    path = Path(path)
-    file_hash = hashlib.sha3_256()
-    with path.open('rb') as stream:
-        # skip ahead to avoid false positives caused by
-        # the timestamp in the header
-        stream.seek(skip*1024)
-        while True:
-            data = stream.read(64*1024)
-            if not data:
-                break
-            file_hash.update(data)
-    return file_hash.hexdigest()
-
-
-def hash_mem(mem, skip=16):
-    mem.seek(skip * 1024)
-    mem_hash = hashlib.sha3_256(mem.read())
-    return mem_hash.hexdigest()
-
-
-def hash_array(array):
-    array_hash = hashlib.sha3_256(array.tobytes())
-    return array_hash.hexdigest()
-
-
-def hash_bytes(b):
-    array_hash = hashlib.sha3_256(b)
-    return array_hash.hexdigest()
+from helper import hash_file, hash_mem, hash_array
+from helper import get_stdout
 
 
 class TestARY022B(unittest.TestCase):
@@ -71,6 +28,8 @@ class TestARY022BCollection(unittest.TestCase):
     def setUpClass(cls):
         cls.aa = ArrayAnalyse('ARY022B')
         cls.cases = Path(__file__).absolute().resolve().parent / 'cases'
+        cls.out_folder = cls.cases / 'testing_collection'
+        cls.out_folder.mkdir(exist_ok=True, parents=True)
         cls.aa.load_collection(cls.cases / 'prepared', rotation=90)
 
         cls.compare_raw_bg = {'position': (0, 0), 'info': ['Reference Spots', 'N/A', 'RS'],
@@ -84,6 +43,7 @@ class TestARY022BCollection(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         del cls.aa
+        shutil.rmtree(cls.out_folder)
 
 
 class LoadFromFile(unittest.TestCase):
@@ -100,7 +60,7 @@ class LoadFromFile(unittest.TestCase):
 class TestArrays(unittest.TestCase):
     cases = Path(__file__).absolute().resolve().parent / 'cases' / 'array_test'
 
-    def testARY007(self):
+    def test_ARY007(self):
         aa = ArrayAnalyse('ARY007')
         aa.strict = False
         aa.load_image(self.cases / 'ARY007.tif')
@@ -110,7 +70,7 @@ class TestArrays(unittest.TestCase):
         self.assertEqual(hash_mem(save_mem),
                          '991c54036fd3a11cf5a8763c0a8cd8fe0638415df4bc84392bb15da6daeacc78')
 
-    def testARY015(self):
+    def test_ARY015(self):
         aa = ArrayAnalyse('ARY015')
         aa.strict = False
         aa.load_image(self.cases / 'ARY015.tif')
@@ -120,7 +80,7 @@ class TestArrays(unittest.TestCase):
         self.assertEqual(hash_mem(save_mem),
                          '95ac01b73c0714c2d39571deadc8e569e2fab5ca17e530df5086890d86c1b390')
 
-    def testARY028(self):
+    def test_ARY028(self):
         aa = ArrayAnalyse('ARY028')
         aa.strict = False
         aa.load_image(self.cases / 'ARY028.tif')
@@ -200,7 +160,6 @@ class LoadCollection(TestARY022BCollection):
                       'value': (0.9603999914272608, 8.169726417758122e-05, 0.9997357674683341)}
         compare_206 = {'position': [9, 0], 'info': ['Reference Spots', 'N/A', 'RS'],
                        'value': (3.7074421357106, -0.017640873154213907, 0.9996119545117066)}
-        print(data[11], data[206])
         for i in range(3):
             self.assertAlmostEqual(data[11]['value'][i], compare_11['value'][i], places=7)
             self.assertAlmostEqual(data[206]['value'][i], compare_206['value'][i], places=7)
@@ -210,9 +169,17 @@ class LoadCollection(TestARY022BCollection):
         compare_11 = {'position': [0, 22], 'info': ['Reference Spots', None, 'RS'], 'value': 3.2279057930907777}
         compare_100 = {'position': [8, 16], 'info': ['TNF-α', '7124', 'TNFSF1A'], 'value': 0.9304401202054406}
 
-        for i in range(3):
-            self.assertAlmostEqual(data[11]['value'], compare_11['value'], places=7)
-            self.assertAlmostEqual(data[100]['value'], compare_100['value'], places=7)
+        self.assertAlmostEqual(data[11]['value'], compare_11['value'], places=7)
+        self.assertAlmostEqual(data[100]['value'], compare_100['value'], places=7)
+
+    def test_evaluate_just_value(self):
+        data = self.aa.evaluate(double_spot=True, just_value=True)
+        self.assertAlmostEqual(data[11], 3.2279057930907777, places=7)
+        self.assertAlmostEqual(data[100], 0.9304401202054406, places=7)
+
+        data = self.aa.evaluate(just_value=True, norm='raw')
+        self.assertAlmostEqual(data[11], 0.03318000141411234, places=7)
+        self.assertAlmostEqual(data[206], 0.1101721369996391, places=7)
 
     def test_reac(self):
         compare_reac = {'position': (0, 0), 'info': ['Reference Spots', 'N/A', 'RS'],
@@ -262,18 +229,40 @@ class LoadCollection(TestARY022BCollection):
         for i in range(len(self.compare_raw_bg['value'])):
             self.assertAlmostEqual(data_raw[0]['value'][i], compare_raw['value'][i], delta=1E-7)
 
-    def test_contact_sheet(self):
-        contact_sheet_mem = io.BytesIO()
-        self.aa.figure_contact_sheet(file=contact_sheet_mem)
-        self.assertEqual(hash_mem(contact_sheet_mem),
+    def test_figure_contact_sheet(self):
+        save_mem = io.BytesIO()
+        self.aa.figure_contact_sheet(file=save_mem)
+        self.assertEqual(hash_mem(save_mem),
                          'a20deb0027988e5fbd645278a497f965390d5ad2e1555dc15600a24a1fc54a54')
 
-        out_folder = self.cases / 'test_contact_sheet'
-        out_folder.mkdir(exist_ok=True, parents=True)
-        self.aa.figure_contact_sheet(file=out_folder / 'contact_sheet.png', max_size=500)
-        self.assertEqual(hash_file(out_folder / 'contact_sheet.png'),
+        self.aa.figure_contact_sheet(file=self.out_folder / 'contact_sheet.png', max_size=500)
+        self.assertEqual(hash_file(self.out_folder / 'contact_sheet.png'),
                          '9c348336b772c1d68e81ba558d2174c7b52d93ca9d7d10364168693cd9288f7c')
-        shutil.rmtree(out_folder)
+
+    def test_figure_alignment(self):
+        save_mem = io.BytesIO()
+        self.aa.figure_alignment(file=save_mem)
+        self.assertEqual(hash_mem(save_mem),
+                         '87d320e4b4ee5be2bc12f797661def7823217f5bcb6f9454637ccb23d2ec0f6d')
+
+        self.aa.figure_alignment(file=self.out_folder / 'alignment.jpg', max_size=500)
+        self.assertEqual(hash_file(self.out_folder / 'alignment.jpg'),
+                         'abc22b8192d0e2d5d10e5631ff50e827da29577c6567a3ee309701e90480cdf2')
+
+    def test_figure_contact_sheet_spot(self):
+        save_mem = io.BytesIO()
+        self.aa.figure_contact_sheet_spot(file=save_mem, position='A1')
+        self.assertEqual(hash_mem(save_mem, skip=0),
+                         '56c6c69b3de8f0677709e16ac7ac85f0883716713900b5f20ba200aba77ec25e')
+
+        self.aa.figure_contact_sheet_spot(file=self.out_folder / 'contact_sheet_spot.jpg', max_size=150, position='A1')
+        self.assertEqual(hash_file(self.out_folder / 'contact_sheet_spot.jpg', skip=0),
+                         '10ddfc8494dda2a3a0e29ed0f1fd996347a10d2b806d212358e390ecc26ef450')
+
+    def test_figure_reaction_fit(self):
+        self.aa.figure_reaction_fit(file=self.out_folder / 'reaction_fit.png')
+        self.assertEqual(hash_file(self.out_folder / 'reaction_fit.png'),
+                         '12e95aac956289f7f24b46e5a1ee3e4149aa3a869602bdeff7fa407bab565bab')
 
     def test_save(self):
         save_mem = io.BytesIO()
@@ -281,12 +270,9 @@ class LoadCollection(TestARY022BCollection):
         self.assertEqual(hash_mem(save_mem),
                          'eff29a8d43c76e929d09e90dc7f1cbf2679d5ea73fc5762b3d71ff65c4a29f54')
 
-        out_folder = self.cases / 'test_save'
-        out_folder.mkdir(exist_ok=True, parents=True)
-        self.aa.save(out_folder / 'dump.tar')
-        self.assertEqual(hash_file(out_folder / 'dump.tar'),
+        self.aa.save(self.out_folder / 'dump.tar')
+        self.assertEqual(hash_file(self.out_folder / 'dump.tar'),
                          'eff29a8d43c76e929d09e90dc7f1cbf2679d5ea73fc5762b3d71ff65c4a29f54')
-        shutil.rmtree(out_folder)
 
 
 if __name__ == '__main__':

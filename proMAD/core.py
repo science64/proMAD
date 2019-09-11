@@ -23,8 +23,7 @@ from skimage.transform import rotate, rescale
 from skimage.util import invert
 from PIL import Image
 
-from . import config
-from .report import report_excel
+from proMAD import Report, config
 
 
 class ArrayAnalyse(object):
@@ -295,12 +294,18 @@ class ArrayAnalyse(object):
             tar = tarfile.TarFile.open(fileobj=file)
         else:
             raise TypeError(f'Type {type(file)} not supported to load.')
-
+        base_data = None
+        data = None
         for member in tar.getmembers():
             if member.name == 'base.json':
                 base_data = json.loads(tar.extractfile(member).read().decode('utf-8'))
             if member.name == "data.npz":
                 data = np.load(tar.extractfile(member))
+
+        if base_data is None or data is None:
+            warnings.warn("The loaded save file was not valid.", RuntimeWarning)
+            return None
+
         if not cls._compare_version(config.allowed_load_version, base_data['version']):
             raise TypeError(f'Save file from version {".".join(base_data["version"])} cannot be loaded')
         aa = cls(base_data['array_type'], silent=base_data['silent'])
@@ -825,9 +830,10 @@ class ArrayAnalyse(object):
             enzyme concentration in mol/L and standard deviation
 
         """
+
         popt, pcov = curve_fit(self.light_reaction, self.exposure, np.average(spot['raw']-self.bg_parameters,
                                                                               (0, 1)), p0=1E-10)
-        return popt[0], np.sqrt(pcov[0])
+        return popt[0], float(np.sqrt(pcov[0]))
 
     def evaluate(self, position=None, norm='hist_raw', just_value=False, double_spot=False):
         """
@@ -840,7 +846,7 @@ class ArrayAnalyse(object):
         - raw: list of averages for all time-steps based on the original image
         - raw_bg: as raw but reduced by the histogram based background value
         - local_bg: mean of the ratios between the original images, and the extracted backgrounds
-        - hist_fg: linear correlation between background (histogram) evolution to the average forground value
+        - hist_fg: the linear correlation between background (histogram) evolution and the average foreground value
         - hist_raw: as hist_fg but compared to the original image
         - reac: estimate of the catalytic enzyme concentration
 
@@ -857,9 +863,10 @@ class ArrayAnalyse(object):
         norm: str
             evaluation strategy selection
         just_value: bool
+            return only the values
         double_spot: bool
-            if True and no position is given double spots will be averaged
-            if a specific position is given both values will be returned
+            no position > if True double spots will be averaged and just the final value is returned
+            specific position > return also the value of the partner
 
         Returns
         -------
@@ -884,7 +891,7 @@ class ArrayAnalyse(object):
             evaluate_spots = self.evaluate_spot_hist_raw
         elif norm == 'reac':
             if not self.has_exposure:
-                self.verbose_print('The reaction model needs exposure time date. Please select a different modus.')
+                self.verbose_print('The reaction model needs exposure time date. Please select a different mode.')
                 return None
             evaluate_spots = self.evaluate_spot_reac
         else:
@@ -894,19 +901,23 @@ class ArrayAnalyse(object):
             for entry in self.array_data['spots']:
                 spot = self.get_spot(entry['position'])
                 value = evaluate_spots(spot)
+                if isinstance(value, tuple):
+                    ds_idx = 0
+                else:
+                    ds_idx = -1
                 if 'double_spot' in self.array_data:
                     ds_spot = self.get_spot(entry['position'], double=self.array_data['double_spot'])
                     ds_value = evaluate_spots(ds_spot)
                     if just_value:
                         if double_spot:
-                            data.append(float((value[0] + ds_value[0])/2))
+                            data.append(float((value[ds_idx] + ds_value[ds_idx])/2))
                         else:
-                            data.append(float(value[0]))
-                            data.append(float(ds_value[0]))
+                            data.append(value[ds_idx])
+                            data.append(ds_value[ds_idx])
                     else:
                         if double_spot:
                             data.append(dict(position=entry['position'], info=entry['info'],
-                                             value=float((value[0]+ds_value[0])/2)))
+                                             value=float((value[ds_idx]+ds_value[ds_idx])/2)))
                         else:
                             data.append(dict(position=entry['position'], info=entry['info'], value=value))
                             position = [entry['position'][0] + self.array_data['double_spot'][0],
@@ -914,7 +925,7 @@ class ArrayAnalyse(object):
                             data.append(dict(position=position, info=entry['info'], value=ds_value))
                 else:
                     if just_value:
-                        data.append(value[0])
+                        data.append(value[ds_idx])
                     else:
                         data.append(dict(position=entry['position'], info=entry['info'], value=value))
 
@@ -960,6 +971,10 @@ class ArrayAnalyse(object):
         count: int
             number of the brightest spots to include in the plot
         """
+
+        if not self.is_finalized:
+            warnings.warn('Data collection needs to be finalized to plot the contact sheet.', RuntimeWarning)
+            return None
 
         if count is None:
             count = self.kappa_fit_count
@@ -1072,6 +1087,7 @@ class ArrayAnalyse(object):
         max_size: int
             size of the longest edge in pixels
         """
+
         if not self.is_finalized:
             warnings.warn('Data collection needs to be finalized to plot the contact sheet.', RuntimeWarning)
             return None
@@ -1136,6 +1152,10 @@ class ArrayAnalyse(object):
             size of the longest edge in pixels
         """
 
+        if not self.is_finalized:
+            warnings.warn('Data collection needs to be finalized to plot the contact sheet.', RuntimeWarning)
+            return None
+
         data_match = {'raw': 'raw', 'fg': 'foreground', 'bg': 'background'}
 
         spot = self.get_spot(position)
@@ -1181,6 +1201,56 @@ class ArrayAnalyse(object):
                 im = Image.fromarray(image)
                 im.save(file, format='JPEG')
 
-    def report(self, file=None, norm='hist_raw', report_type='xlsx'):
-        if report_type == 'xlsx':
-            report_excel(aa=self, file=file, norm=norm)
+    def report(self, file=None, norm='hist_raw', report_type=None):
+        """
+        Summarize the results for a specific evaluation strategy in a report.
+
+        Notes
+        -----
+        Different report modules are available:
+
+        - json
+        - csv (no metadata are stored in this format!)
+        - excel
+
+        Parameters
+        ----------
+        file:
+            can be a path to a file (a string), a path-like object, or a file-like object
+        norm: str
+            evaluation strategy selection (see ArrayAnalyse.evaluate)
+        report_type: str
+            set the report type, if none try to guess depending on file name
+        """
+
+        if not self.is_finalized:
+            warnings.warn('Data collection needs to be finalized to create a report.', RuntimeWarning)
+            return None
+
+        report_types = {
+            'json': dict(suffix=('.json',), func=Report.exp_json),
+            'csv': dict(suffix=('.csv', '.txt', ''), func=Report.exp_csv),
+            'excel': dict(suffix=('.xlsx',), func=Report.exp_excel),
+            'latex': dict(suffix=('.tex',), func=Report.exp_excel)
+        }
+
+        if report_type is None:
+            if isinstance(file, os.PathLike) or isinstance(file, str):
+                file = Path(file)
+                if file.suffix.lower() == '.xls':
+                    file = file.with_suffix('.xlsx')
+                for key, entry in report_types.items():
+                    if file.suffix.lower() in entry['suffix']:
+                        report_type = key
+                        break
+
+        if report_type not in report_types:
+            warnings.warn(f'"{report_type}" is not defined as report type.', RuntimeWarning)
+            return
+
+        if file is None:
+            warnings.warn(f'No file was given.', RuntimeWarning)
+            return
+
+        report_types[report_type]['func'](aa=self, file=file, norm=norm)
+

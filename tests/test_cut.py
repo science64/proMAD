@@ -6,20 +6,7 @@ import shutil
 from proMAD import Cutter
 from proMAD.cut import scn_file
 
-
-def hash_file(path):
-    path = Path(path)
-    file_hash = hashlib.sha3_256()
-    with path.open('rb') as stream:
-        # skip ahead to avoid false positives caused by
-        # the timestamp in the header
-        stream.seek(16*1024)
-        while True:
-            data = stream.read(64*1024)
-            if not data:
-                break
-            file_hash.update(data)
-    return file_hash.hexdigest()
+from helper import hash_file
 
 
 class TestCutter(unittest.TestCase):
@@ -106,3 +93,7 @@ class TestSCN(unittest.TestCase):
         self.assertEqual(meta, fo_meta)
         self.assertEqual(hashlib.sha3_256(fo_data.tobytes()).hexdigest(),
                          '3ce238af1c5313d7d28829593ebe914722e4e5a2d0d3dadbc904d202b2efaa4b')
+
+
+if __name__ == '__main__':
+    unittest.main()

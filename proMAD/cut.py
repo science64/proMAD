@@ -10,12 +10,12 @@ import io
 def scn_file(file, out_path=None):
     """
     Read image and metadata from .scn (Image Lab) files.
-    If a out_path is given the extracted data is stored as .tif file instead.
+    If an out_path is given the extracted data is stored as .tif file instead.
 
     Parameters
     ----------
     file:
-        file can be a path to a file (a string), a file-like object or a path-like object
+        file can be a path to a file (a string), a path-like object, or a file-like object
     out_path: Path or str
 
     Returns
@@ -135,7 +135,6 @@ class Cutter(object):
 
         """
         file_path = Path(file_path)
-        print(file_path)
         print(f'Load image from "{file_path}"')
         if file_path.suffix == '.scn':
             source_image, meta_data = scn_file(file_path.absolute())
@@ -213,7 +212,7 @@ class Cutter(object):
 
     def guess_positions(self):
         """
-        Generate a initial cut pattern with a simple guess.
+        Generate an initial cut pattern with a simple guess.
         """
         ishape = self.images[-1]['data'].shape
         x_space = [0]+[ishape[1]/self.shape[0]] * (self.shape[0])
