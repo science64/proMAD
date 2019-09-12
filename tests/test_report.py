@@ -48,16 +48,16 @@ class TestWithARY022B(unittest.TestCase):
         test_file_path = self.out_folder / 'rep.csv'
         self.aa.report(test_file_path)
         self.assertEqual(hash_file(test_file_path, skip=0),
-                         'da519d1d722cecd6f30a409389e2d141733c58507e81549c67a619cb287c6953')
+                         'aea119104d34a08fdb1359dd65c682122247b73a0de998a41ffaec58948bbd2b')
         test_file_path.unlink()
         self.aa.report(test_file_path, norm='raw')
         self.assertEqual(hash_file(test_file_path, skip=0),
-                         '3c093be302781733aadbe063f4e09032a5bf780613a87e780af0b8487efdf5be')
+                         'b9aad28fe2444c63bf6131fabc97330e2adac3bdf33efab82954380e3c9304ef')
 
         save_mem = io.StringIO()
         self.aa.report(save_mem, report_type='csv')
         self.assertEqual(hash_string_mem(save_mem),
-                         'da519d1d722cecd6f30a409389e2d141733c58507e81549c67a619cb287c6953')
+                         'aea119104d34a08fdb1359dd65c682122247b73a0de998a41ffaec58948bbd2b')
 
     def test_json(self):
         test_file_path = self.out_folder / 'rep.json'

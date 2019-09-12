@@ -250,12 +250,12 @@ class Report:
             with open(file, 'w', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
                 writer.writerows((header, ))
-                writer.writerows([[row['info'][0], row['position']] + [float(v) for v in row['value']] for row in data])
+                writer.writerows([[row['info'][0], row['position']] + [f'{v:.8g}' for v in row['value']] for row in data])
 
         elif isinstance(file, (io.TextIOBase, io.TextIOWrapper)):
             writer = csv.writer(file)
             writer.writerows((header,))
-            writer.writerows([[row['info'][0], row['position']] + [float(v) for v in row['value']] for row in data])
+            writer.writerows([[row['info'][0], row['position']] + [f'{v:.8g}' for v in row['value']] for row in data])
 
     @classmethod
     def exp_json(cls, aa, file, norm='hist_raw', additional_info=None):
