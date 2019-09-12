@@ -4,7 +4,7 @@ Semiquantitative densitometric measurement of protein microarrays
 
 [![PyPi](https://img.shields.io/pypi/v/proMAD.svg?style=for-the-badge)](https://pypi.org/project/proMAD/)
 [![Status](https://img.shields.io/pypi/status/proMAD.svg?style=for-the-badge)](https://pypi.org/project/proMAD/)
-[![Github issues](https://img.shields.io/github/issues/theia-dev/proMAD.svg?style=for-the-badge)](https://github.com/theia-dev/proMAD/issues)
+[![Coverage](https://img.shields.io/coveralls/github/theia-dev/proMAD?style=for-the-badge)](https://coveralls.io/github/theia-dev/proMAD)
 [![Build](https://img.shields.io/travis/theia-dev/proMAD.svg?style=for-the-badge)](https://travis-ci.org/theia-dev/proMAD)
 [![License](https://img.shields.io/github/license/theia-dev/proMAD.svg?style=for-the-badge)](https://github.com/theia-dev/proMAD/blob/master/LICENSE.txt)
 
