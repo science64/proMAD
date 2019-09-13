@@ -91,6 +91,25 @@ class TestWithARY022B(unittest.TestCase):
         self.assertAlmostEqual(data['result'][11]['r_squared'], compare_11['r_squared'], places=7)
         self.assertAlmostEqual(data['result'][123]['r_squared'], compare_123['r_squared'], places=7)
 
+    def test_latex(self):
+        test_file_path = self.out_folder / 'rep.tex'
+        self.aa.report(test_file_path)
+
+        self.assertTrue((self.out_folder / 'logo.png').is_file())
+        self.assertTrue((self.out_folder / 'figure_alignment.jpg').is_file())
+
+        compare = [
+            r'\item [Array Name:] Human XL Cytokine Array Kit (Proteome Profiler Array)',
+            r'\node[anchor=south west, inner sep=0] (image) at (0,0) {\includegraphics[width=0.9\textwidth]',
+            r'\node [anchor=east] (E) at (0, 0.550 ) {\small E};',
+            r'\node [anchor=south] (15) at (0.604, 1) {\small 15};',
+            r'BDNF &627~\href{https://www.ncbi.nlm.nih.gov/gene/?term=627}{\faExternalLink}& A15, A16 &0.9561\\',
+            r'Serpin E1 &5054~\href{https://www.ncbi.nlm.nih.gov/gene/?term=5054}{\faExternalLink}& I1, I2 &3.831\\'
+        ]
+        generated_tex = test_file_path.read_text()
+        for part in compare:
+            self.assertIn(part, generated_tex)
+
     def test_excel(self):
         test_file_path = self.out_folder / 'rep.xls'
         self.aa.report(test_file_path)
@@ -112,14 +131,14 @@ class TestWithARY022B(unittest.TestCase):
             ws = wb['Results']
             self.assertEqual('A1:C112', ws.calculate_dimension())
             self.assertEqual(ws['A4'].value, 'Serpin E1')
-            self.assertEqual(ws['B4'].value, '[8, 0]')
+            self.assertEqual(ws['B4'].value, 'I1, I2')
             self.assertAlmostEqual(ws['C4'].value, 3.83146659901802, places=7)
 
             ws = wb['Result details']
             self.assertEqual('A1:E221', ws.calculate_dimension())
             self.assertEqual(ws['E3'].value, 'R_Squared')
-            self.assertEqual(ws['B4'].value, '[8, 0]')
-            self.assertEqual(ws['B7'].value, '[8, 1]')
+            self.assertEqual(ws['B4'].value, 'I1')
+            self.assertEqual(ws['B7'].value, 'I2')
             self.assertAlmostEqual(ws['C4'].value, 4.12145253276224, places=7)
             self.assertAlmostEqual(ws['C7'].value, 3.54148066527379, places=7)
 

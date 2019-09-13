@@ -223,7 +223,7 @@ class Cutter(object):
         print([x_list, y_list])
         self.cut_positions = [x_list, y_list]
 
-    def preview(self, example=-1):
+    def preview(self, example=-1):  # pragma: no cover
         """
         Show a preview of the set cut pattern through matplotlib.
 

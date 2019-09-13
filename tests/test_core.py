@@ -103,6 +103,34 @@ class LoadImagesWrongRotation(TestARY022B):
 
 
 class LoadImages(TestARY022B):
+    def test_finalize_warnings(self):
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+
+            self.aa.get_spot('A1')
+            self.aa.evaluate()
+            self.aa.save(None)
+
+            self.assertEqual(len(w), 3)
+            for i in range(3):
+                self.assertEqual(w[i].category, RuntimeWarning)
+                self.assertIn("Data collection needs to be finalized", str(w[i].message))
+
+    def test_finalize_warnings_figures(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+
+            self.aa.figure_alignment()
+            self.aa.figure_reaction_fit()
+            self.aa.figure_contact_sheet()
+            self.aa.figure_contact_sheet_spot('A1')
+
+            self.assertEqual(len(w), 4)
+            for i in range(4):
+                self.assertEqual(w[i].category, RuntimeWarning)
+                self.assertIn("Data collection needs to be finalized to generate the figure.", str(w[i].message))
+
     def test_load_image(self):
         self.aa.debug = True
         self.aa.load_image(self.cases / 'prepared/prepared_00020.tif', rotation=90)
@@ -180,6 +208,39 @@ class LoadCollection(TestARY022BCollection):
         data = self.aa.evaluate(just_value=True, norm='raw')
         self.assertAlmostEqual(data[11], 0.03318000141411234, places=7)
         self.assertAlmostEqual(data[206], 0.1101721369996391, places=7)
+
+    def test_evaluate_spot(self):
+        compare_normal = [{'position': (0, 0), 'info': ['Reference Spots', None, 'RS'],
+                           'value': (3.9027168252815465, -0.014834386535689317, 0.9976046377512487)}]
+        compare_just = [(1.15796238349657, -0.001719920301677249, 0.9997724465008571)]
+        compare_double = [{'position': (0, 0), 'info': ['Reference Spots', None, 'RS'],
+                           'value': (3.9027168252815465, -0.014834386535689317, 0.9976046377512487)},
+                          {'position': (0, 1), 'info': ['Reference Spots', None, 'RS'],
+                           'value': (3.924585455094854, -0.014271288247623928, 0.9966464736583901)}]
+        compare_double_just = [(1.15796238349657, -0.001719920301677249, 0.9997724465008571),
+                               (0.9686154279191376, 0.00011914453689753496, 0.9998588407500172)]
+
+        normal = self.aa.evaluate('A1')
+        just = self.aa.evaluate('C7', just_value=True)
+        double = self.aa.evaluate('A1', double_spot=True)
+        double_just = self.aa.evaluate('C7', double_spot=True, just_value=True)
+
+        self.assertEqual(normal[0]['position'], compare_normal[0]['position'])
+        self.assertAlmostEquals(normal[0]['value'][0], compare_normal[0]['value'][0], delta=1E-13)
+
+        self.assertAlmostEquals(just[0][0], compare_just[0][0], delta=1E-13)
+
+        self.assertEqual(double[0]['position'], compare_double[0]['position'])
+        self.assertAlmostEquals(double[0]['value'][0], compare_double[0]['value'][0], delta=1E-13)
+        self.assertEqual(double[1]['position'], compare_double[1]['position'])
+        self.assertAlmostEquals(double[1]['value'][0], compare_double[1]['value'][0], delta=1E-13)
+
+        self.assertAlmostEquals(double_just[0][0], compare_double_just[0][0], delta=1E-13)
+        self.assertAlmostEquals(double_just[1][0], compare_double_just[1][0], delta=1E-13)
+
+    def test_get_spot_empty(self):
+        self.assertIsNone(self.aa.get_spot('Ä5'))
+        self.assertIsNone(self.aa.get_spot((3, 4, 5)))
 
     def test_reac(self):
         compare_reac = {'position': (0, 0), 'info': ['Reference Spots', 'N/A', 'RS'],

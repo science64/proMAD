@@ -22,6 +22,7 @@ from skimage.morphology import reconstruction
 from skimage.transform import rotate, rescale
 from skimage.util import invert
 from PIL import Image
+from openpyxl.utils import get_column_letter
 
 from proMAD import Report, config
 
@@ -429,7 +430,7 @@ class ArrayAnalyse(object):
         if self.has_exposure:
             self.minimize_kappa()
 
-        if self.debug == 'plot':
+        if self.debug == 'plot': # pragma: no cover
             self.figure_alignment()
             self.figure_contact_sheet()
 
@@ -598,7 +599,7 @@ class ArrayAnalyse(object):
         dis_3 = np.min(np.sqrt((x - ref_3_guess[0]) ** 2 + (y - ref_3_guess[1]) ** 2))
         dis_test = max(dis_1, dis_2, dis_3)/min(y_length_test, x_length_test)
 
-        if self.debug == 'plot':
+        if self.debug == 'plot':  # pragma: no cover
             fig, ax = plt.subplots()
             ax.imshow(image, interpolation='nearest', cmap=plt.cm.gray)
             ax.scatter(x, y, zorder=2, marker='o', c=np.arange(len(x))+1, cmap=plt.cm.viridis, label='detected contours')
@@ -661,6 +662,40 @@ class ArrayAnalyse(object):
             return background_parameter[0]/(2**11)
         else:
             return background_parameter
+
+    @staticmethod
+    def get_position_string(position):
+        """
+        Convert coordinates to position string.
+
+        Parameters
+        ----------
+        position: (int, int) or str or list
+            coordinates  [(3,5), (8,12), ...]
+
+        Returns
+        -------
+        str
+            position string
+
+        """
+        if isinstance(position, str):
+            return position
+        if len(position) == 2:
+            if isinstance(position[0], int) and isinstance(position[1], int):
+                return get_column_letter(position[0]+1)+str(position[1]+1)
+
+        result = []
+        for pos in position:
+            if isinstance(pos, str):
+                result.append(pos)
+            elif len(pos) == 2:
+                if isinstance(pos[0], int) and isinstance(pos[1], int):
+                    result.append(get_column_letter(pos[0]+1)+str(pos[1]+1))
+                else:
+                    result.append(None)
+
+        return result
 
     @staticmethod
     def get_position_coordinates(position):
@@ -916,8 +951,12 @@ class ArrayAnalyse(object):
                             data.append(ds_value[ds_idx])
                     else:
                         if double_spot:
-                            data.append(dict(position=entry['position'], info=entry['info'],
-                                             value=float((value[ds_idx]+ds_value[ds_idx])/2)))
+                            data.append(dict(position=[entry['position'], [entry['position'][0] +
+                                                                           self.array_data['double_spot'][0],
+                                                                           entry['position'][1] +
+                                                                           self.array_data['double_spot'][1]]],
+                                             info=entry['info'],
+                                             value=float((value[ds_idx] + ds_value[ds_idx]) / 2)))
                         else:
                             data.append(dict(position=entry['position'], info=entry['info'], value=value))
                             position = [entry['position'][0] + self.array_data['double_spot'][0],
@@ -951,7 +990,7 @@ class ArrayAnalyse(object):
                 spot = self.get_spot(position, double=True)
                 value = evaluate_spots(spot)
                 if just_value:
-                    data.append(value[0])
+                    data.append(value)
                 else:
                     position = (position[0] + self.array_data['double_spot'][0],
                                 position[1] + self.array_data['double_spot'][1])
@@ -973,7 +1012,7 @@ class ArrayAnalyse(object):
         """
 
         if not self.is_finalized:
-            warnings.warn('Data collection needs to be finalized to plot the contact sheet.', RuntimeWarning)
+            warnings.warn('Data collection needs to be finalized to generate the figure.', RuntimeWarning)
             return None
 
         if count is None:
@@ -1000,7 +1039,7 @@ class ArrayAnalyse(object):
             ax.plot(self.exposure/60, y, c='black')
             ax.scatter(self.exposure/60, y_raw, c='#469DFF', s=3, zorder=5)
 
-        if file is None:
+        if file is None:  # pragma: no cover
             fig.show()
         else:
             if isinstance(file, os.PathLike) or isinstance(file, str):
@@ -1026,7 +1065,7 @@ class ArrayAnalyse(object):
         """
 
         if not self.is_finalized:
-            warnings.warn('Data collection needs to be finalized to plot the contact sheet.', RuntimeWarning)
+            warnings.warn('Data collection needs to be finalized to generate the figure.', RuntimeWarning)
             return None
 
         x_num = sum(self.array_data['net_layout_x'])
@@ -1051,7 +1090,7 @@ class ArrayAnalyse(object):
                 else:
                     align_image[x_pos[0]:x_pos[1], y_pos[0]:y_pos[1]] = invert(spot)
 
-        if file is None:
+        if file is None:  # pragma: no cover
             fig, ax = plt.subplots()
             ax.set_title(f'Align test {kind}')
             ax.imshow(align_image, interpolation='nearest', cmap=plt.cm.CMRmap, vmin=0, vmax=1)
@@ -1089,7 +1128,7 @@ class ArrayAnalyse(object):
         """
 
         if not self.is_finalized:
-            warnings.warn('Data collection needs to be finalized to plot the contact sheet.', RuntimeWarning)
+            warnings.warn('Data collection needs to be finalized to generate the figure.', RuntimeWarning)
             return None
         pad = 20
         y_count = int(np.ceil(np.sqrt(self.raw_images.size) / self.raw_images.shape[1]))
@@ -1113,7 +1152,7 @@ class ArrayAnalyse(object):
         image = np.log(image+0.1)
         image = ((image - np.min(image)) * (1 / (np.max(image) - np.min(image))))
 
-        if file is None:
+        if file is None: # pragma: no cover
             fig, ax = plt.subplots()
             ax.set_title(f'Contact sheet {kind}')
             ax.imshow(image, interpolation='nearest', cmap=plt.cm.CMRmap_r, vmin=0, vmax=1)
@@ -1153,7 +1192,7 @@ class ArrayAnalyse(object):
         """
 
         if not self.is_finalized:
-            warnings.warn('Data collection needs to be finalized to plot the contact sheet.', RuntimeWarning)
+            warnings.warn('Data collection needs to be finalized to generate the figure.', RuntimeWarning)
             return None
 
         data_match = {'raw': 'raw', 'fg': 'foreground', 'bg': 'background'}
@@ -1179,7 +1218,7 @@ class ArrayAnalyse(object):
         image = np.log(css + 0.1)
         image = ((image - np.min(image)) * (1 / (np.max(image) - np.min(image))))
 
-        if file is None:
+        if file is None: # pragma: no cover
             fig, ax = plt.subplots()
             ax.set_title(f'Contact spot sheet ({data_match[kind]})')
             ax.imshow(image, interpolation='nearest', cmap=plt.cm.CMRmap_r, vmin=0, vmax=1)
@@ -1231,7 +1270,7 @@ class ArrayAnalyse(object):
             'json': dict(suffix=('.json',), func=Report.exp_json),
             'csv': dict(suffix=('.csv', '.txt', ''), func=Report.exp_csv),
             'excel': dict(suffix=('.xlsx',), func=Report.exp_excel),
-            'latex': dict(suffix=('.tex',), func=Report.exp_excel)
+            'latex': dict(suffix=('.tex',), func=Report.exp_latex)
         }
 
         if report_type is None:

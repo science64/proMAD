@@ -8,3 +8,5 @@ requests
 scikit-image
 scipy
 xmltodict
+jinja2
+pylatexenc

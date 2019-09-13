@@ -6,6 +6,9 @@ import warnings
 from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+import jinja2
+from pylatexenc.latexencode import unicode_to_latex
+import shutil
 
 from openpyxl import Workbook
 from openpyxl.chart import BarChart, Reference
@@ -44,6 +47,58 @@ class Report:
         hist_raw='background ratio',
         reac='concentration in mol/L'
     )
+
+    tex_env = jinja2.Environment(
+        block_start_string=r'\BLOCK{',
+        block_end_string='}',
+        variable_start_string=r'\VAR{',
+        variable_end_string='}',
+        comment_start_string=r'\#{',
+        comment_end_string='}',
+        line_statement_prefix='%%',
+        line_comment_prefix='%#',
+        trim_blocks=True,
+        autoescape=False,
+        lstrip_blocks=True,
+        loader=jinja2.FileSystemLoader(str(config.template_folder.absolute()))
+    )
+
+    @classmethod
+    def get_details(cls, aa, norm, tex=False):
+        now = datetime.now()
+        now = now.replace(microsecond=0)
+        detail_values = dict(
+            program='proMAD',
+            version=config.version,
+            url=config.url,
+            date=now.date().isoformat(),
+            time=now.time().isoformat(),
+            array_name=aa.array_data['name'],
+            array_type=aa.array_data['array_type'],
+            array_id=aa.array_data['id'],
+            norm=norm,
+            norm_description=cls.norm_descriptions[norm],
+            unit=cls.norm_unit[norm]
+        )
+        if tex:
+            for key in detail_values:
+                detail_values[key] = unicode_to_latex(detail_values[key]
+                                                      )
+        detail_names = dict(
+            date='Date',
+            time='Time',
+            program='Program',
+            version='Version',
+            url='URL',
+            array_name='Array Name',
+            array_type='Array Type',
+            array_id='Array ID',
+            norm='Norm key',
+            norm_description='Norm description',
+            unit='Unit'
+        )
+
+        return detail_values, detail_names
 
     @classmethod
     def exp_excel(cls, aa, file, norm='hist_raw', name=None, additional_info=None):
@@ -127,7 +182,10 @@ class Report:
         new_rows = []
         data = aa.evaluate(norm=norm, double_spot=True)
         for entry in data:
-            new_rows.append([entry['info'][0], str(entry['position']), entry['value']])
+            pos = aa.get_position_string(entry['position'])
+            if not isinstance(pos, str):
+                pos = ", ".join(pos)
+            new_rows.append([entry['info'][0], pos, entry['value']])
 
         if name is None:
             ws['A1'] = 'Membrane Results'
@@ -167,7 +225,7 @@ class Report:
 
         data = aa.evaluate(norm=norm)
         for entry in data:
-            new_rows.append([entry['info'][0], str(entry['position'])] + [v for v in entry['value']])
+            new_rows.append([entry['info'][0], aa.get_position_string(entry['position'])] + [v for v in entry['value']])
         if name is None:
             ws['A1'] = 'Membrane Result Details'
         else:
@@ -196,24 +254,21 @@ class Report:
 
         ws['A1'] = f'Technical data'
         ws['A1'].style = highlight
-        now = datetime.now()
-        tech_data_list = [
-            ('Date', now.date()),
-            ('Time', now.time()),
-            ('', ''),
-            ('Program', 'proMAD'),
-            ('Version', config.version),
-            ('URL', config.url),
-            ('', ''),
-            ('Array Name', aa.array_data['name']),
-            ('Array Type', aa.array_data['array_type']),
-            ('Array ID', aa.array_data['id']),
-            ('Norm key', norm),
-            ('Norm description', cls.norm_descriptions[norm]),
-            ('Unit', cls.norm_unit[norm])
-        ]
+        detail_values, detail_names = cls.get_details(aa, norm)
+        info_list = ['date', 'time', 'skip',
+                     'program', 'version', 'url', 'skip',
+                     'array_name', 'array_type', 'array_id', 'norm', 'norm_description', 'unit'
+                     ]
+        tech_data_list = []
+        for key in info_list:
+            if key == 'skip':
+                tech_data_list.append(('', ''))
+            else:
+                tech_data_list.append((detail_names[key], detail_values[key]))
+
         if additional_info:
             tech_data_list += [('', '')] + additional_info
+
         ws.column_dimensions['A'].width = 15
         ws.column_dimensions['B'].width = 15
         for n, content in enumerate(tech_data_list):
@@ -231,7 +286,7 @@ class Report:
     @classmethod
     def exp_csv(cls, aa, file, norm='hist_raw'):
         """
-        Export results in an Excel file.
+        Export results in a comma separated file.
 
         Parameters
         ----------
@@ -258,9 +313,67 @@ class Report:
             writer.writerows([[row['info'][0], row['position']] + [f'{v:.8g}' for v in row['value']] for row in data])
 
     @classmethod
+    def exp_latex(cls, aa, file, norm='hist_raw', additional_info=None):
+        """
+        Export results as tex file.
+
+        Parameters
+        ----------
+        aa:
+            ArrayAnalyse instant
+        norm: str
+                evaluation strategy selection (see ArrayAnalyse.evaluate)
+        file:
+            can be a path to a file (a string), a path-like object, or a file-like object (string based)
+        additional_info: dict
+            dictionary with pairs of additional information
+        """
+
+        overview = []
+
+        data = aa.evaluate(norm=norm, double_spot=True)
+        for entry in data:
+            pos = aa.get_position_string(entry['position'])
+            if not isinstance(pos, str):
+                pos = ", ".join(pos)
+
+            overview.append(dict(
+                name=unicode_to_latex(entry['info'][0]),
+                gene_id=entry['info'][1],
+                position=pos,
+                value=f"{entry['value']:.4g}")
+            )
+
+        overview = sorted(overview, key=lambda s: s['name'].lower())
+        info_dict = dict(overview=overview)
+        info_dict['dv'], info_dict['dn'] = cls.get_details(aa, norm, tex=True)
+
+        col_num = sum(aa.array_data['net_layout_x'])
+        row_num = sum(aa.array_data['net_layout_y'])
+
+        info_dict['ai'] = dict(
+            row=[(get_column_letter(row_num-n), f'{n/row_num + 0.5/row_num:.3f}') for n in range(row_num)],
+            col=[(str(n+1), f'{n/col_num + 0.5/col_num:.3f}') for n in range(col_num)]
+        )
+
+        template = cls.tex_env.get_template('short_report.tex')
+
+        content = template.render(**info_dict)
+
+        if isinstance(file, os.PathLike) or isinstance(file, str):
+            file = Path(file)
+            file.write_text(content)
+            shutil.copy(config.template_folder / 'logo.png', file.parent / 'logo.png')
+            aa.figure_alignment(file=file.parent / 'figure_alignment.jpg')
+
+        elif isinstance(file, (io.TextIOBase, io.TextIOWrapper)):
+            file.seek(0)
+            file.write(content)
+
+    @classmethod
     def exp_json(cls, aa, file, norm='hist_raw', additional_info=None):
         """
-        Export results in an Excel file.
+        Export results in a structured json file.
 
         Parameters
         ----------
@@ -288,22 +401,9 @@ class Report:
                 for n, name in enumerate(cls.norm_return[norm]):
                     entry[name] = float(value[n])
 
-        now = datetime.now()
         export_dict = dict(
             result=data,
-            info=dict(
-                program='proMAD',
-                version=config.version,
-                url=config.url,
-                date=now.date().isoformat(),
-                time=now.time().isoformat(),
-                array_name=aa.array_data['name'],
-                array_yype=aa.array_data['array_type'],
-                array_id=aa.array_data['id'],
-                norm=norm,
-                norm_describtion=cls.norm_descriptions[norm],
-                unit=cls.norm_unit[norm]
-            ),
+            info=cls.get_details(aa, norm)[0]
         )
 
         if additional_info:

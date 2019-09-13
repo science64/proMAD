@@ -1,0 +1,94 @@
+\documentclass[12pt]{scrartcl}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[hidelinks]{hyperref}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{siunitx}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{textcomp}
+\usepackage{fontawesome}
+\usepackage{tikz}
+\usepackage{enumitem}
+ \setlist{nosep}
+ \setlist{noitemsep}
+
+\sisetup{
+    exponent-product = \cdot,
+    list-units = single,
+    detect-all,
+    table-figures-exponent=2
+}
+
+\sloppy
+\clubpenalty = 10000 
+\widowpenalty = 10000
+\hyphenpenalty = 500
+
+\pagestyle{fancy}
+\fancyfoot{}
+\fancyhead{}
+\fancyfoot[C]{\small This report was generated on \VAR{dv['date']}~\VAR{dv['time']} }
+\fancyfoot[R]{\thepage}
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\headrulewidth}{0pt}
+
+\begin{document}
+\begin{minipage}[c]{.18\textwidth}
+    \includegraphics[height = 2.5cm]{logo.png}
+\end{minipage}
+\begin{minipage}[c]{.82\textwidth}
+{\huge\textbf{\VAR{dv['program']}} \VAR{dv['version']}}
+\end{minipage}\hfill
+
+\vspace{\baselineskip}
+\begin{center}
+    \begin{description}
+        \BLOCK{ if (data_set_name is defined) and (data_set_name != '') }
+        \item [Data Set Name:] \VAR{data_set_name}
+        \BLOCK{ endif }
+        \item [\VAR{dn['array_id']}:] \VAR{dv['array_id']}
+        \item [\VAR{dn['array_name']}:] \VAR{dv['array_name']} (\VAR{dv['array_type']})
+        \item [\VAR{dn['norm']}:] \VAR{dv['norm']}
+        \item [\VAR{dn['norm_description']}:] \VAR{dv['norm_description']}
+        \item[\VAR{dn['unit']}:] \VAR{dv['unit']}
+    \end{description}
+\end{center}
+
+\begin{figure}[hb!]
+\begin{tikzpicture}
+\node[anchor=south west, inner sep=0] (image) at (0,0) {\includegraphics[width=0.9\textwidth]{figure_alignment.jpg}};
+    \begin{scope}[x={(image.south east)}, y={(image.north west)}]
+        \BLOCK{ for letter, pos in ai['row'] }
+            \node [anchor=east] (\VAR{ letter }) at (0, \VAR{ pos } ) {\small \VAR{ letter }};
+        \BLOCK{ endfor }
+        \BLOCK{ for num, pos in ai['col'] }
+            \node [anchor=south] (\VAR{ num }) at (\VAR{ pos }, 1) {\small \VAR{ num }};
+        \BLOCK{ endfor }
+    \end{scope}
+\end{tikzpicture}%
+\caption{Overview and alignment check}\label{fig:alignment}
+\end{figure}
+
+
+\begin{longtable}{l|rcS[table-number-alignment = center]}
+    \caption{List of average values of analyte spots.}\label{tab:all}\\
+    \toprule
+    {Analyte} & {Entrez Gene ID} & {Coordinate} & {Value}\\
+    \midrule
+    \endhead
+    \BLOCK{ for entry in overview }
+    \VAR{entry["name"]} &
+    \BLOCK{- if entry["gene_id"] -}
+    \VAR{entry["gene_id"]}~\href{https://www.ncbi.nlm.nih.gov/gene/?term=\VAR{entry["gene_id"]}}{\faExternalLink}
+    \BLOCK{- endif -}
+    & \VAR{entry["position"]} &\VAR{entry["value"]}\\
+    \BLOCK{ endfor }
+    \bottomrule
+\end{longtable}
+\end{document}
+

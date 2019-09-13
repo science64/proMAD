@@ -7,7 +7,8 @@ app_author = 'Anna Jaeschke; Hagen Eckert'
 url = 'https://proMAD.dev'
 
 base_dir = Path(__file__).absolute().parent
-array_data_folder = base_dir / 'array_data'
+array_data_folder = base_dir / 'data' / 'array'
+template_folder = base_dir / 'data' / 'templates'
 allowed_load_version = (0, 1, 0)
 
 scale = 30

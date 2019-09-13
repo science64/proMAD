@@ -1,1 +1,3 @@
-include proMAD/array_data/*.json
+include proMAD/data/array/*.json
+include proMAD/data/templates/report.tex
+
