@@ -1,8 +1,13 @@
-from setuptools import setup
+import sys
 from pathlib import Path
-from proMAD import config
+
+from setuptools import setup
 
 base_dir = Path(__file__).absolute().parent
+sys.path.insert(0, str(base_dir / 'proMAD'))
+
+import config  # import proMAD config without triggering the module __init__.py
+
 read_me = base_dir / 'README.md'
 long_description = read_me.read_text(encoding='utf-8')
 version = config.version

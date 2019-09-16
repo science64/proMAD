@@ -1,4 +1,4 @@
-# proMAD
+# proMAD <img src='proMAD/data/templates/logo.png?raw=true' align="right"/>
 Semiquantitative densitometric measurement of protein microarrays
 
 
@@ -12,7 +12,7 @@ Semiquantitative densitometric measurement of protein microarrays
 ## Setup
     pip install proMAD
     
-You can also install the latest version directly from Github.
+You can also install the latest version directly from GitHub.
 
     pip install git+https://github.com/theia-dev/proMAD.git#egg=proMAD
 
@@ -45,7 +45,7 @@ c.preview()  # display guess (uses the last loaded image as default)
 c.set_positions()  # ask for refined cut positions
 c.set_names()  # ask for names
 c.preview()  # check in the preview
-c.save_images('test/cases/formatted_image_folder')  # save to folder (will be created if it does not exist
+c.save_images('test/cases/formatted_image_folder')  # save to folder (will be created if it does not exist)
 ```
 
 * direct
@@ -59,6 +59,6 @@ c.shape = (2, 3)
 c.cut_positions = [[20, 225, 445], [40, 130, 217, 315]]
 c.names = [['OL', 'ML', 'UL'], [None, 'MR', 'UR']]
 c.preview()
-c.save_images('test/cases/formatted_image_folder')  # save to folder (will be created if it does not exist
+c.save_images('test/cases/formatted_image_folder')  # save to folder (will be created if it does not exist)
 ```
 
