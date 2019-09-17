@@ -18,6 +18,10 @@ class TestWithARY022B(unittest.TestCase):
         cls.aa = ArrayAnalyse.load(cls.cases / 'save' / 'dump.tar')
         cls.out_folder = cls.cases / 'testing_reports'
         cls.out_folder.mkdir(exist_ok=True, parents=True)
+        cls.additional_info = [
+            dict(key='system_name', name='System name', value='UnitTest'),
+            dict(key='membrane_name', name='Membrane name', value='Membrane A')
+        ]
 
     @classmethod
     def tearDownClass(cls):
@@ -68,7 +72,7 @@ class TestWithARY022B(unittest.TestCase):
         compare_123 = {'position': [5, 11], 'info': ['IL-31', '386653', None], 'value': 0.9974935542164649,
                        'intercept': -0.0008484813336183776, 'r_squared': 0.9992305292185427}
 
-        self.aa.report(test_file_path, norm='raw')
+        self.aa.report(test_file_path, norm='raw', additional_info=self.additional_info)
         data = json.loads(test_file_path.read_text())
 
         self.assertAlmostEqual(data['result'][11]['values'][0], 0.023836107062511658, places=7)
@@ -78,6 +82,9 @@ class TestWithARY022B(unittest.TestCase):
         self.assertAlmostEqual(data['result'][123]['values'][0], 0.023919083139474023, places=7)
         self.assertAlmostEqual(data['result'][123]['values'][2], 0.027834284233911134, places=7)
         self.assertAlmostEqual(data['result'][123]['values'][4], 0.03295996329826092, places=7)
+
+        for entry in self.additional_info:
+            self.assertEqual(data['info'][entry['key']], entry['value'])
 
         save_mem = io.StringIO()
         self.aa.report(save_mem, report_type='json')
@@ -93,7 +100,7 @@ class TestWithARY022B(unittest.TestCase):
 
     def test_latex(self):
         test_file_path = self.out_folder / 'rep.tex'
-        self.aa.report(test_file_path)
+        self.aa.report(test_file_path, additional_info=self.additional_info)
 
         self.assertTrue((self.out_folder / 'logo.png').is_file())
         self.assertTrue((self.out_folder / 'figure_alignment.jpg').is_file())
@@ -104,20 +111,22 @@ class TestWithARY022B(unittest.TestCase):
             r'\node [anchor=east] (E) at (0, 0.550 ) {\small E};',
             r'\node [anchor=south] (15) at (0.604, 1) {\small 15};',
             r'BDNF &627~\href{https://www.ncbi.nlm.nih.gov/gene/?term=627}{\faExternalLink}& A15, A16 &0.9561\\',
-            r'Serpin E1 &5054~\href{https://www.ncbi.nlm.nih.gov/gene/?term=5054}{\faExternalLink}& I1, I2 &3.831\\'
+            r'Serpin E1 &5054~\href{https://www.ncbi.nlm.nih.gov/gene/?term=5054}{\faExternalLink}& I1, I2 &3.831\\',
+            r'\item [System name:] UnitTest'
         ]
+
         generated_tex = test_file_path.read_text()
         for part in compare:
             self.assertIn(part, generated_tex)
 
     def test_excel(self):
         test_file_path = self.out_folder / 'rep.xls'
-        self.aa.report(test_file_path)
+        self.aa.report(test_file_path, additional_info=self.additional_info)
         test_file_path = test_file_path.with_suffix('.xlsx')
         wb_file = load_workbook(filename=test_file_path, read_only=True)
 
         save_mem = io.BytesIO()
-        self.aa.report(save_mem, report_type='excel')
+        self.aa.report(save_mem, report_type='excel', additional_info=self.additional_info)
         wb_mem = load_workbook(filename=save_mem, read_only=True)
 
         for wb in [wb_mem, wb_file]:
@@ -143,14 +152,17 @@ class TestWithARY022B(unittest.TestCase):
             self.assertAlmostEqual(ws['C7'].value, 0.965608450754212, places=7)
 
             ws = wb['Info']
-            self.assertEqual('A1:B15', ws.calculate_dimension())
+            self.assertEqual('A1:B19', ws.calculate_dimension())
             info_data = []
             for row in ws.rows:
                 for cell in row:
                     info_data.append(cell.value)
             self.assertIn('ARY022B', info_data)
             self.assertIn('hist_raw', info_data)
-            self.assertIn('Norm description', info_data)
+            self.assertIn('Method description', info_data)
+            for entry in self.additional_info:
+                self.assertIn(entry['name'], info_data)
+                self.assertIn(entry['value'], info_data)
 
 
 if __name__ == '__main__':

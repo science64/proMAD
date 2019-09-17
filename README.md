@@ -1,4 +1,4 @@
-# proMAD <img src='proMAD/data/templates/logo.png?raw=true' align="right"/>
+# proMAD <img src='https://github.com/theia-dev/proMAD/raw/master/proMAD/data/templates/logo.png' align="right"/>
 Semiquantitative densitometric measurement of protein microarrays
 
 

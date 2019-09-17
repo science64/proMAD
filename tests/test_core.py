@@ -303,8 +303,9 @@ class LoadCollection(TestARY022BCollection):
             '87027ff24e5dc57ee7ba21c10969a4b5873fb980c92a09fb657b690a790b5532'])
 
         self.aa.figure_alignment(file=self.out_folder / 'alignment.jpg', max_size=500)
-        self.assertEqual(hash_file(self.out_folder / 'alignment.jpg'),
-                         'abc22b8192d0e2d5d10e5631ff50e827da29577c6567a3ee309701e90480cdf2')
+        self.assertIn(hash_file(self.out_folder / 'alignment.jpg'), [
+            'abc22b8192d0e2d5d10e5631ff50e827da29577c6567a3ee309701e90480cdf2',
+            '315efb4e3b7ce92dcfa0999b36014c2d63d87700b3d40caa54bb0c3a02799aeb'])
 
     def test_figure_contact_sheet_spot(self):
         save_mem = io.BytesIO()
@@ -314,8 +315,9 @@ class LoadCollection(TestARY022BCollection):
             '953544ba7e4e0c70eaa70de6dc513b52849da5fe0e5b5adfedfcacf835232781'])
 
         self.aa.figure_contact_sheet_spot(file=self.out_folder / 'contact_sheet_spot.jpg', max_size=150, position='A1')
-        self.assertEqual(hash_file(self.out_folder / 'contact_sheet_spot.jpg', skip=0),
-                         '10ddfc8494dda2a3a0e29ed0f1fd996347a10d2b806d212358e390ecc26ef450')
+        self.assertIn(hash_file(self.out_folder / 'contact_sheet_spot.jpg', skip=0), [
+            '10ddfc8494dda2a3a0e29ed0f1fd996347a10d2b806d212358e390ecc26ef450',
+            '60f694b096a3ff2e0820bc896b1351dfa270cef59db8343e218a6acf997285a3'])
 
     def test_figure_reaction_fit(self):
         self.aa.figure_reaction_fit(file=self.out_folder / 'reaction_fit.png')

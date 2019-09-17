@@ -10,6 +10,8 @@ import jinja2
 from pylatexenc.latexencode import unicode_to_latex
 import shutil
 
+from typing import List, Dict
+
 from openpyxl import Workbook
 from openpyxl.chart import BarChart, Reference
 from openpyxl.drawing.image import Image as opImage
@@ -28,6 +30,15 @@ class Report:
         hist_fg="linear correlation between background (histogram) evolution to the average foreground value",
         hist_raw="linear correlation between background (histogram) evolution to the average original image",
         reac="estimate of the catalytic enzyme concentration"
+    )
+
+    norm_names = dict(
+        raw='Spot average',
+        raw_bg='Background corrected spot average',
+        local_bg='Ratio to local background',
+        hist_fg='Foreground to global background ratio',
+        hist_raw='Ratio to global background',
+        reac='Catalytic enzyme concentration'
     )
 
     norm_return = dict(
@@ -76,6 +87,7 @@ class Report:
             array_name=aa.array_data['name'],
             array_type=aa.array_data['array_type'],
             array_id=aa.array_data['id'],
+            norm_name=cls.norm_names[norm],
             norm=norm,
             norm_description=cls.norm_descriptions[norm],
             unit=cls.norm_unit[norm]
@@ -93,15 +105,16 @@ class Report:
             array_name='Array Name',
             array_type='Array Type',
             array_id='Array ID',
-            norm='Norm key',
-            norm_description='Norm description',
+            norm_name='Method',
+            norm='Method key',
+            norm_description='Method description',
             unit='Unit'
         )
 
         return detail_values, detail_names
 
     @classmethod
-    def exp_excel(cls, aa, file, norm='hist_raw', name=None, additional_info=None):
+    def exp_excel(cls, aa, file, norm='hist_raw', additional_info=None):
         """
         Export results in an Excel file.
 
@@ -113,10 +126,8 @@ class Report:
                 evaluation strategy selection (see ArrayAnalyse.evaluate)
         file:
             file can be a path to a file (a string), a path-like object, or a file-like object
-        name: str
-            membrane name
-        additional_info: list((str, str))
-            a list with pairs of additional information ('name', 'value')
+        additional_info: List[Dict]
+            list with dictionaries containing 'name' and 'value' key
         """
 
         if not aa.is_finalized:
@@ -193,10 +204,7 @@ class Report:
             else:
                 new_rows.append([entry['info'][0], pos, entry['value']])
 
-        if name is None:
-            ws['A1'] = 'Membrane Results'
-        else:
-            ws['A1'] = f'{name} Results'
+        ws['A1'] = 'Membrane Results'
         ws['A1'].style = highlight
         ws.append([])
         ws.append(('Name', 'Position', 'Value'))
@@ -235,10 +243,7 @@ class Report:
         data = aa.evaluate(norm=norm)
         for entry in data:
             new_rows.append([entry['info'][0], aa.get_position_string(entry['position'])] + [v for v in entry['value']])
-        if name is None:
-            ws['A1'] = 'Membrane Result Details'
-        else:
-            ws['A1'] = f'{name} Result Details'
+        ws['A1'] = 'Membrane Result Details'
         ws['A1'].style = highlight
         ws.append([])
         ws.append(['Name', 'Position'] + [head.title() for head in cls.norm_return[norm]])
@@ -262,7 +267,7 @@ class Report:
         detail_values, detail_names = cls.get_details(aa, norm)
         info_list = ['date', 'time', 'skip',
                      'program', 'version', 'url', 'skip',
-                     'array_name', 'array_type', 'array_id', 'norm', 'norm_description', 'unit'
+                     'array_name', 'array_type', 'array_id', 'norm_name', 'norm', 'norm_description', 'unit'
                      ]
         tech_data_list = []
         for key in info_list:
@@ -272,7 +277,7 @@ class Report:
                 tech_data_list.append((detail_names[key], detail_values[key]))
 
         if additional_info:
-            tech_data_list += [('', '')] + additional_info
+            tech_data_list += [('', '')] + [(entry['name'], entry['value']) for entry in additional_info]
 
         ws.column_dimensions['A'].width = 15
         ws.column_dimensions['B'].width = 15
@@ -289,7 +294,7 @@ class Report:
                 file.write(tmp.read())
 
     @classmethod
-    def exp_csv(cls, aa, file, norm='hist_raw'):
+    def exp_csv(cls, aa, file, norm='hist_raw', additional_info=None):
         """
         Export results in a comma separated file.
 
@@ -298,9 +303,11 @@ class Report:
         aa:
             ArrayAnalyse instant
         norm: str
-                evaluation strategy selection (see ArrayAnalyse.evaluate)
+            evaluation strategy selection (see ArrayAnalyse.evaluate)
         file:
             file can be a path to a file (a string), a path-like object, or a file-like object (string based)
+        additional_info:
+            is ignored for CSV
         """
 
         data = aa.evaluate(norm=norm)
@@ -330,8 +337,8 @@ class Report:
                 evaluation strategy selection (see ArrayAnalyse.evaluate)
         file:
             can be a path to a file (a string), a path-like object, or a file-like object (string based)
-        additional_info: dict
-            dictionary with pairs of additional information
+        additional_info: List[Dict]
+            list with dictionaries containing name and value key
         """
 
         overview = []
@@ -367,6 +374,11 @@ class Report:
         col_num = sum(aa.array_data['net_layout_x'])
         row_num = sum(aa.array_data['net_layout_y'])
 
+        if additional_info:
+            for entry in additional_info:
+                entry['name'] = unicode_to_latex(entry['name'])
+                entry['value'] = unicode_to_latex(entry['value'])
+        info_dict['additional_info'] = additional_info
         info_dict['ai'] = dict(
             row=[(get_column_letter(row_num-n), f'{n/row_num + 0.5/row_num:.3f}') for n in range(row_num)],
             col=[(str(n+1), f'{n/col_num + 0.5/col_num:.3f}') for n in range(col_num)]
@@ -399,8 +411,8 @@ class Report:
                 evaluation strategy selection (see ArrayAnalyse.evaluate)
         file:
             can be a path to a file (a string), a path-like object, or a file-like object (string based)
-        additional_info: dict
-            dictionary with pairs of additional information
+        additional_info: List[Dict]
+            list with dictionaries containing 'key' and 'value' key
         """
 
         data = aa.evaluate(norm=norm)
@@ -423,7 +435,12 @@ class Report:
         )
 
         if additional_info:
-            export_dict['info'].update(additional_info)
+            info_update = {entry['key']: entry['value'] for entry in additional_info}
+        else:
+            info_update = {}
+
+        if additional_info:
+            export_dict['info'].update(info_update)
 
         if isinstance(file, os.PathLike) or isinstance(file, str):
             Path(file).write_text(json.dumps(export_dict, indent=4))

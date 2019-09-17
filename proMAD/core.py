@@ -1240,7 +1240,7 @@ class ArrayAnalyse(object):
                 im = Image.fromarray(image)
                 im.save(file, format='JPEG')
 
-    def report(self, file=None, norm='hist_raw', report_type=None):
+    def report(self, file=None, norm='hist_raw', report_type=None, additional_info=None):
         """
         Summarize the results for a specific evaluation strategy in a report.
 
@@ -1291,5 +1291,5 @@ class ArrayAnalyse(object):
             warnings.warn(f'No file was given.', RuntimeWarning)
             return
 
-        report_types[report_type]['func'](aa=self, file=file, norm=norm)
+        report_types[report_type]['func'](aa=self, file=file, norm=norm, additional_info=additional_info)
 

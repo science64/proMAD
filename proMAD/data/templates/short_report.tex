@@ -54,9 +54,14 @@
         \BLOCK{ endif }
         \item [\VAR{dn['array_id']}:] \VAR{dv['array_id']}
         \item [\VAR{dn['array_name']}:] \VAR{dv['array_name']} (\VAR{dv['array_type']})
-        \item [\VAR{dn['norm']}:] \VAR{dv['norm']}
+        \item [\VAR{dn['norm_name']}:] \VAR{dv['norm_name']} (libkey: \VAR{ dv.norm })
         \item [\VAR{dn['norm_description']}:] \VAR{dv['norm_description']}
-        \item[\VAR{dn['unit']}:] \VAR{dv['unit']}
+        \item [\VAR{dn['unit']}:] \VAR{dv['unit']}
+        \BLOCK{ if additional_info }
+        \BLOCK{ for entry in additional_info }
+        \item [\VAR{entry.name}:] \VAR{entry.value}
+        \BLOCK{ endfor }
+        \BLOCK{ endif }
     \end{description}
 \end{center}
 
@@ -65,7 +70,7 @@
 \begin{axis}[
     width  = \textwidth,
     bar width=0.04*\textwidth,
-    height = 11cm,
+    height = 9cm,
     ybar,
     compat=newest,
     ymajorgrids = true,
@@ -100,9 +105,6 @@
 \end{tikzpicture}%
 \caption{Overview and alignment check}\label{fig:alignment}
 \end{figure}
-
-
-
 
 \begin{longtable}{l|rcS[table-number-alignment = center]}
     \caption{List of average values of analyte spots.}\label{tab:all}\\
