@@ -144,14 +144,16 @@ class Report:
 
         # Overview worksheet
         ws = wb.active
-        if name is None:
-            ws['A1'] = 'Membrane Overview'
-        else:
-            ws['A1'] = f'{name} Overview'
-        ws['A1'].style = highlight
+
+        alignment_img = opImage(config.template_folder/'logo.png')
+        ws.add_image(alignment_img, f"B1")
+
+        ws['E4'] = f'proMAD'
+        ws['E5'] = config.version
+        ws['E4'].style = highlight
         ws.title = "Overview"
         data = aa.evaluate(norm=norm)
-        row_offset = 4
+        row_offset = 12
         column_offset = 2
         if cls.norm_return[norm] == ('values',):
             for entry in data:
@@ -180,12 +182,16 @@ class Report:
         ws = wb.create_sheet()
         ws.title = "Results"
         new_rows = []
+        ref_spots = []
         data = aa.evaluate(norm=norm, double_spot=True)
         for entry in data:
             pos = aa.get_position_string(entry['position'])
             if not isinstance(pos, str):
                 pos = ", ".join(pos)
-            new_rows.append([entry['info'][0], pos, entry['value']])
+            if 'Reference' in entry['info'][0] or 'Negative Controls' in entry['info'][0]:
+                ref_spots.append([entry['info'][0], pos, entry['value']])
+            else:
+                new_rows.append([entry['info'][0], pos, entry['value']])
 
         if name is None:
             ws['A1'] = 'Membrane Results'
@@ -198,7 +204,10 @@ class Report:
         ws['B3'].style = bold
         ws['C3'].style = bold_right
 
-        data_start = 4
+        data_start = 5 + len(ref_spots)
+        for row in sorted(ref_spots, key=lambda s: s[2], reverse=True):
+            ws.append(row)
+        ws.append([])
         for row in sorted(new_rows, key=lambda s: s[2], reverse=True):
             ws.append(row)
         ws.column_dimensions['A'].width = 20
@@ -237,11 +246,7 @@ class Report:
         ws['B3'].style = bold
         for n in range(len(cls.norm_return[norm])):
             ws[get_column_letter(n+3)+'3'].style = bold_right
-        if cls.norm_return[norm] == ('values',):
-            sort_idx = -1
-        else:
-            sort_idx = 2
-        for row in sorted(new_rows, key=lambda s: s[sort_idx], reverse=True):
+        for row in sorted(new_rows, key=lambda s: s[0].lower()):
             ws.append(row)
 
         ws.column_dimensions['A'].width = 20
@@ -330,22 +335,33 @@ class Report:
         """
 
         overview = []
-
+        reference = []
         data = aa.evaluate(norm=norm, double_spot=True)
         for entry in data:
             pos = aa.get_position_string(entry['position'])
             if not isinstance(pos, str):
                 pos = ", ".join(pos)
 
-            overview.append(dict(
-                name=unicode_to_latex(entry['info'][0]),
-                gene_id=entry['info'][1],
-                position=pos,
-                value=f"{entry['value']:.4g}")
-            )
+            if 'Reference' in entry['info'][0]:
+                reference.append(dict(
+                    name=unicode_to_latex(entry['info'][0]),
+                    gene_id=entry['info'][1],
+                    position=pos,
+                    value=f"{entry['value']:.4g}",
+                    sort=entry['value'])
+                )
+            else:
+                overview.append(dict(
+                    name=unicode_to_latex(entry['info'][0]),
+                    gene_id=entry['info'][1],
+                    position=pos,
+                    value=f"{entry['value']:.4g}",
+                    sort=entry['value'])
+                )
 
-        overview = sorted(overview, key=lambda s: s['name'].lower())
-        info_dict = dict(overview=overview)
+        best = sorted(overview, key=lambda s: s['sort'], reverse=True)[:15]
+        overview = sorted(overview+reference, key=lambda s: s['name'].lower())
+        info_dict = dict(overview=overview, best=best)
         info_dict['dv'], info_dict['dn'] = cls.get_details(aa, norm, tex=True)
 
         col_num = sum(aa.array_data['net_layout_x'])

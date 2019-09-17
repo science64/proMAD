@@ -122,25 +122,25 @@ class TestWithARY022B(unittest.TestCase):
 
         for wb in [wb_mem, wb_file]:
             ws = wb['Overview']
-            self.assertAlmostEqual(ws['B4'].value, 3.58838189472233, places=7)
-            self.assertAlmostEqual(ws['Y4'].value, 2.8227990771837, places=7)
-            self.assertAlmostEqual(ws['B13'].value, 3.72477602867501, places=7)
-            self.assertEqual(ws['B15'].value, 'Fig. 1: Overview and alignment check')
-            self.assertEqual('A1:Y15', ws.calculate_dimension())
+            self.assertAlmostEqual(ws['B12'].value, 3.58838189472233, places=7)
+            self.assertAlmostEqual(ws['Y12'].value, 2.8227990771837, places=7)
+            self.assertAlmostEqual(ws['B21'].value, 3.72477602867501, places=7)
+            self.assertEqual(ws['B23'].value, 'Fig. 1: Overview and alignment check')
+            self.assertEqual('A4:Y23', ws.calculate_dimension())
 
             ws = wb['Results']
-            self.assertEqual('A1:C112', ws.calculate_dimension())
-            self.assertEqual(ws['A4'].value, 'Serpin E1')
-            self.assertEqual(ws['B4'].value, 'I1, I2')
-            self.assertAlmostEqual(ws['C4'].value, 3.83146659901802, places=7)
+            self.assertEqual('A1:C113', ws.calculate_dimension())
+            self.assertEqual(ws['A9'].value, 'Serpin E1')
+            self.assertEqual(ws['B9'].value, 'I1, I2')
+            self.assertAlmostEqual(ws['C9'].value, 3.83146659901802, places=7)
 
             ws = wb['Result details']
             self.assertEqual('A1:E221', ws.calculate_dimension())
             self.assertEqual(ws['E3'].value, 'R_Squared')
-            self.assertEqual(ws['B4'].value, 'I1')
-            self.assertEqual(ws['B7'].value, 'I2')
-            self.assertAlmostEqual(ws['C4'].value, 4.12145253276224, places=7)
-            self.assertAlmostEqual(ws['C7'].value, 3.54148066527379, places=7)
+            self.assertEqual(ws['B4'].value, 'A3')
+            self.assertEqual(ws['B7'].value, 'A8')
+            self.assertAlmostEqual(ws['C4'].value, 1.1110434212512, places=7)
+            self.assertAlmostEqual(ws['C7'].value, 0.965608450754212, places=7)
 
             ws = wb['Info']
             self.assertEqual('A1:B15', ws.calculate_dimension())

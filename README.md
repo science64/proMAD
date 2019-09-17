@@ -14,7 +14,7 @@ Semiquantitative densitometric measurement of protein microarrays
     
 You can also install the latest version directly from GitHub.
 
-    pip install git+https://github.com/theia-dev/proMAD.git#egg=proMAD
+    pip install -U git+https://github.com/theia-dev/proMAD.git#egg=proMAD
 
     
 ## Usage

@@ -12,6 +12,7 @@
 \usepackage{booktabs}
 \usepackage{textcomp}
 \usepackage{fontawesome}
+\usepackage{pgfplots}
 \usepackage{tikz}
 \usepackage{enumitem}
  \setlist{nosep}
@@ -61,6 +62,32 @@
 
 \begin{figure}[hb!]
 \begin{tikzpicture}
+\begin{axis}[
+    width  = \textwidth,
+    bar width=0.04*\textwidth,
+    height = 11cm,
+    ybar,
+    compat=newest,
+    ymajorgrids = true,
+    x tick label style={rotate=90},
+    ylabel={\VAR{dv['unit']}},
+    symbolic x coords={\BLOCK{- for entry in best -}
+        \VAR{ entry['name'] },
+    \BLOCK{- endfor -}},
+    xtick=data,
+    ymin=0.0,
+    ]
+\addplot coordinates {
+    \BLOCK{ for entry in best }
+    (\VAR{ entry['name'] },\VAR{ entry['value'] })
+    \BLOCK{ endfor }};
+\end{axis}
+\end{tikzpicture}
+\caption{Top spots}\label{fig:block}
+\end{figure}
+
+\begin{figure}[h!]
+\begin{tikzpicture}
 \node[anchor=south west, inner sep=0] (image) at (0,0) {\includegraphics[width=0.9\textwidth]{figure_alignment.jpg}};
     \begin{scope}[x={(image.south east)}, y={(image.north west)}]
         \BLOCK{ for letter, pos in ai['row'] }
@@ -73,6 +100,8 @@
 \end{tikzpicture}%
 \caption{Overview and alignment check}\label{fig:alignment}
 \end{figure}
+
+
 
 
 \begin{longtable}{l|rcS[table-number-alignment = center]}

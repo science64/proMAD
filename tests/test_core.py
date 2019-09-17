@@ -65,30 +65,24 @@ class TestArrays(unittest.TestCase):
         aa.strict = False
         aa.load_image(self.cases / 'ARY007.tif')
         aa.finalize_collection()
-        save_mem = io.BytesIO()
-        aa.figure_alignment(file=save_mem)
-        self.assertEqual(hash_mem(save_mem),
-                         '991c54036fd3a11cf5a8763c0a8cd8fe0638415df4bc84392bb15da6daeacc78')
+        self.assertAlmostEqual(0.5117877836372805, aa.evaluate('A1', just_value=True, norm='raw')[0][0], delta=1E-13)
+        self.assertAlmostEqual(0.06156276344709296, aa.evaluate('E13', just_value=True, norm='raw')[0][0], delta=1E-13)
 
     def test_ARY015(self):
         aa = ArrayAnalyse('ARY015')
         aa.strict = False
         aa.load_image(self.cases / 'ARY015.tif')
         aa.finalize_collection()
-        save_mem = io.BytesIO()
-        aa.figure_alignment(file=save_mem)
-        self.assertEqual(hash_mem(save_mem),
-                         '95ac01b73c0714c2d39571deadc8e569e2fab5ca17e530df5086890d86c1b390')
+        self.assertAlmostEqual(0.2759596293934661, aa.evaluate('A1', just_value=True, norm='raw')[0][0], delta=1E-13)
+        self.assertAlmostEqual(0.18749890601518324, aa.evaluate('E13', just_value=True, norm='raw')[0][0], delta=1E-13)
 
     def test_ARY028(self):
         aa = ArrayAnalyse('ARY028')
         aa.strict = False
         aa.load_image(self.cases / 'ARY028.tif')
         aa.finalize_collection()
-        save_mem = io.BytesIO()
-        aa.figure_alignment(file=save_mem)
-        self.assertEqual(hash_mem(save_mem),
-                         '3573ce7aad79c56d098c99bb8523def6fc1f670068c72624af4d75bfa5abe7fb')
+        self.assertAlmostEqual(0.5281856065937371, aa.evaluate('A1', just_value=True, norm='raw')[0][0], delta=1E-13)
+        self.assertAlmostEqual(0.05475981244045449, aa.evaluate('E13', just_value=True, norm='raw')[0][0], delta=1E-13)
 
 
 class LoadImagesWrongRotation(TestARY022B):
@@ -226,17 +220,17 @@ class LoadCollection(TestARY022BCollection):
         double_just = self.aa.evaluate('C7', double_spot=True, just_value=True)
 
         self.assertEqual(normal[0]['position'], compare_normal[0]['position'])
-        self.assertAlmostEquals(normal[0]['value'][0], compare_normal[0]['value'][0], delta=1E-13)
+        self.assertAlmostEqual(normal[0]['value'][0], compare_normal[0]['value'][0], delta=1E-13)
 
-        self.assertAlmostEquals(just[0][0], compare_just[0][0], delta=1E-13)
+        self.assertAlmostEqual(just[0][0], compare_just[0][0], delta=1E-13)
 
         self.assertEqual(double[0]['position'], compare_double[0]['position'])
-        self.assertAlmostEquals(double[0]['value'][0], compare_double[0]['value'][0], delta=1E-13)
+        self.assertAlmostEqual(double[0]['value'][0], compare_double[0]['value'][0], delta=1E-13)
         self.assertEqual(double[1]['position'], compare_double[1]['position'])
-        self.assertAlmostEquals(double[1]['value'][0], compare_double[1]['value'][0], delta=1E-13)
+        self.assertAlmostEqual(double[1]['value'][0], compare_double[1]['value'][0], delta=1E-13)
 
-        self.assertAlmostEquals(double_just[0][0], compare_double_just[0][0], delta=1E-13)
-        self.assertAlmostEquals(double_just[1][0], compare_double_just[1][0], delta=1E-13)
+        self.assertAlmostEqual(double_just[0][0], compare_double_just[0][0], delta=1E-13)
+        self.assertAlmostEqual(double_just[1][0], compare_double_just[1][0], delta=1E-13)
 
     def test_get_spot_empty(self):
         self.assertIsNone(self.aa.get_spot('Ä5'))
@@ -293,8 +287,9 @@ class LoadCollection(TestARY022BCollection):
     def test_figure_contact_sheet(self):
         save_mem = io.BytesIO()
         self.aa.figure_contact_sheet(file=save_mem)
-        self.assertEqual(hash_mem(save_mem),
-                         'a20deb0027988e5fbd645278a497f965390d5ad2e1555dc15600a24a1fc54a54')
+        self.assertIn(hash_mem(save_mem), [
+            'a20deb0027988e5fbd645278a497f965390d5ad2e1555dc15600a24a1fc54a54',
+            'cf2b7980a7cbb3e929e693d7978ff0f77a6999844adb696b1fa1dea4e25310a3'])
 
         self.aa.figure_contact_sheet(file=self.out_folder / 'contact_sheet.png', max_size=500)
         self.assertEqual(hash_file(self.out_folder / 'contact_sheet.png'),
@@ -303,8 +298,9 @@ class LoadCollection(TestARY022BCollection):
     def test_figure_alignment(self):
         save_mem = io.BytesIO()
         self.aa.figure_alignment(file=save_mem)
-        self.assertEqual(hash_mem(save_mem),
-                         '87d320e4b4ee5be2bc12f797661def7823217f5bcb6f9454637ccb23d2ec0f6d')
+        self.assertIn(hash_mem(save_mem),[
+            '87d320e4b4ee5be2bc12f797661def7823217f5bcb6f9454637ccb23d2ec0f6d',
+            '87027ff24e5dc57ee7ba21c10969a4b5873fb980c92a09fb657b690a790b5532'])
 
         self.aa.figure_alignment(file=self.out_folder / 'alignment.jpg', max_size=500)
         self.assertEqual(hash_file(self.out_folder / 'alignment.jpg'),
@@ -313,8 +309,9 @@ class LoadCollection(TestARY022BCollection):
     def test_figure_contact_sheet_spot(self):
         save_mem = io.BytesIO()
         self.aa.figure_contact_sheet_spot(file=save_mem, position='A1')
-        self.assertEqual(hash_mem(save_mem, skip=0),
-                         '56c6c69b3de8f0677709e16ac7ac85f0883716713900b5f20ba200aba77ec25e')
+        self.assertIn(hash_mem(save_mem, skip=0), [
+            '56c6c69b3de8f0677709e16ac7ac85f0883716713900b5f20ba200aba77ec25e',
+            '953544ba7e4e0c70eaa70de6dc513b52849da5fe0e5b5adfedfcacf835232781'])
 
         self.aa.figure_contact_sheet_spot(file=self.out_folder / 'contact_sheet_spot.jpg', max_size=150, position='A1')
         self.assertEqual(hash_file(self.out_folder / 'contact_sheet_spot.jpg', skip=0),
@@ -327,13 +324,12 @@ class LoadCollection(TestARY022BCollection):
 
     def test_save(self):
         save_mem = io.BytesIO()
+        hash_compare = ['e0ba8b1fea5c9b2dab4cabcff8447bb27fa46bba0be766fe12950c790023242a',  # python 3.8
+                        'eff29a8d43c76e929d09e90dc7f1cbf2679d5ea73fc5762b3d71ff65c4a29f54']
         self.aa.save(file=save_mem)
-        self.assertEqual(hash_mem(save_mem),
-                         'eff29a8d43c76e929d09e90dc7f1cbf2679d5ea73fc5762b3d71ff65c4a29f54')
-
+        self.assertIn(hash_mem(save_mem), hash_compare)
         self.aa.save(self.out_folder / 'dump.tar')
-        self.assertEqual(hash_file(self.out_folder / 'dump.tar'),
-                         'eff29a8d43c76e929d09e90dc7f1cbf2679d5ea73fc5762b3d71ff65c4a29f54')
+        self.assertIn(hash_file(self.out_folder / 'dump.tar'), hash_compare)
 
 
 if __name__ == '__main__':
