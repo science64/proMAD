@@ -4,6 +4,7 @@ import unittest
 import warnings
 from pathlib import Path
 
+import numpy as np
 from proMAD import ArrayAnalyse
 
 from helper import hash_file, hash_mem, hash_array
@@ -47,14 +48,22 @@ class TestARY022BCollection(unittest.TestCase):
 
 
 class LoadFromFile(unittest.TestCase):
+    cases = Path(__file__).absolute().resolve().parent / 'cases'
 
-    def test_load(self):
-        cases = Path(__file__).absolute().resolve().parent / 'cases'
-        aa = ArrayAnalyse.load(cases / 'save' / 'dump.tar')
-        self.assertEqual(hash_array(aa.foregrounds),
-                         '993f84db0f1211cfd9859571e9d1db8dc2443d179c5199c60fd3774057f27f0f')
-        self.assertEqual(hash_array(aa.raw_images),
-                         '46ee47b580e20c10cd9c50c598944929887f41a86f64ecca8071085ae5dde93c')
+    def test_load_too_old(self):
+        self.assertRaises(TypeError, ArrayAnalyse.load, self.cases / 'save' / 'dump_0_1_0.tar')
+
+    def test_modify_exposure_t(self):
+        aa = ArrayAnalyse.load(self.cases / 'save' / 'dump_0_3_0.tar')
+        exposure, reorder = aa.modify_exposure({'start': 10, 'step': 30}, test=True)
+        self.assertFalse(reorder)
+        self.assertListEqual(exposure, [10, 40, 70, 100, 130])
+
+    def test_modify_exposure_mix(self):
+        aa = ArrayAnalyse.load(self.cases / 'save' / 'dump_0_3_0.tar')
+        exposure, reorder = aa.modify_exposure([10, 40, 100, 70, 130])
+        self.assertTrue(reorder)
+        np.testing.assert_array_equal(aa.raw_index, [0, 1, 3, 2, 4])
 
 
 class TestArrays(unittest.TestCase):
@@ -134,10 +143,10 @@ class LoadImages(TestARY022B):
 
         content = (self.cases / 'prepared/prepared_00030.tif').read_bytes()
         mem_im = io.BytesIO(content)
-        self.aa.load_image(mem_im, rotation=90, suffix='.tif')
+        self.aa.load_image(mem_im, rotation=90, filename='prepared/prepared_00030.tif')
 
         with (self.cases / 'prepared/prepared_00032.tif').open('rb') as fo:
-            self.aa.load_image(fo, rotation=90, suffix='.tif')
+            self.aa.load_image(fo, rotation=90, filename='prepared/prepared_00032.tif')
 
         self.aa.finalize_collection()
 
@@ -161,6 +170,7 @@ class LoadImages(TestARY022B):
             self.assertEqual(len(w), 1)
             self.assertEqual(w[-1].category, RuntimeWarning)
             self.assertIn("Data is already finalized.", str(w[-1].message))
+
         self.aa.reset_collection()
         self.assertEqual(self.aa.source_images, [])
 
@@ -324,14 +334,21 @@ class LoadCollection(TestARY022BCollection):
         self.assertEqual(hash_file(self.out_folder / 'reaction_fit.png'),
                          '12e95aac956289f7f24b46e5a1ee3e4149aa3a869602bdeff7fa407bab565bab')
 
-    def test_save(self):
+    def test_save_load(self):
         save_mem = io.BytesIO()
-        hash_compare = ['e0ba8b1fea5c9b2dab4cabcff8447bb27fa46bba0be766fe12950c790023242a',  # python 3.8
-                        'eff29a8d43c76e929d09e90dc7f1cbf2679d5ea73fc5762b3d71ff65c4a29f54']
         self.aa.save(file=save_mem)
-        self.assertIn(hash_mem(save_mem), hash_compare)
+        save_mem_hash = hash_mem(save_mem, skip=0)
+        save_mem.seek(0)
+        saved_aa = ArrayAnalyse.load(save_mem)
+        np.testing.assert_array_equal(saved_aa.original_index, self.aa.original_index)
+        np.testing.assert_array_equal(saved_aa.exposure, self.aa.exposure)
+        np.testing.assert_array_equal(saved_aa.raw_images, self.aa.raw_images)
+        del saved_aa
+
         self.aa.save(self.out_folder / 'dump.tar')
-        self.assertIn(hash_file(self.out_folder / 'dump.tar'), hash_compare)
+        save_file_hash = hash_file(self.out_folder / 'dump.tar', skip=0)
+
+        self.assertEqual(save_file_hash, save_mem_hash)
 
 
 if __name__ == '__main__':

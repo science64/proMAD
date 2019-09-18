@@ -15,7 +15,7 @@ class TestWithARY022B(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.cases = Path(__file__).absolute().resolve().parent / 'cases'
-        cls.aa = ArrayAnalyse.load(cls.cases / 'save' / 'dump.tar')
+        cls.aa = ArrayAnalyse.load(cls.cases / 'save' / 'dump_0_3_0.tar')
         cls.out_folder = cls.cases / 'testing_reports'
         cls.out_folder.mkdir(exist_ok=True, parents=True)
         cls.additional_info = [

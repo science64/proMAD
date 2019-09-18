@@ -99,6 +99,10 @@ class ArrayAnalyse(object):
         self.backgrounds = []
         self.foregrounds = []
         self.bg_parameters = []
+        self.original_average = []
+        self.original_names = []
+        self.original_index = []
+        self.raw_index = []
         self.exposure = []
         self.meta_data = []
         self.debug = None
@@ -136,7 +140,8 @@ class ArrayAnalyse(object):
                                "is_finalized",
                                "_kappa"]
         self.save_list_data = ['source_images', 'raw_images', 'backgrounds', 'foregrounds',
-                               'bg_parameters', 'exposure']
+                               'bg_parameters', 'exposure', 'original_index', 'original_average',
+                               'original_average', 'raw_index']
 
         self.grid_position = np.zeros((sum(self.array_data['net_layout_x']), sum(self.array_data['net_layout_y']), 2))
 
@@ -216,6 +221,10 @@ class ArrayAnalyse(object):
             print(f'\tCompany: {array["company"]}')
             print(f'\tSource: {array["source"]}\n')
 
+    @property
+    def raw_names(self):
+        return [self.original_names[i] for i in self.raw_index]
+
     def save(self, file):
         """
         Saves the finalized content of an ArrayAnalyse instant into a .tar file
@@ -244,6 +253,10 @@ class ArrayAnalyse(object):
                                 foregrounds=self.foregrounds,
                                 bg_parameters=self.bg_parameters,
                                 exposure=self.exposure,
+                                original_names=self.original_names,
+                                original_index=self.original_index,
+                                original_average=self.original_average,
+                                raw_index=self.raw_index,
                                 _fit_selection=self._fit_selection
                                 )
         else:
@@ -253,6 +266,10 @@ class ArrayAnalyse(object):
                                 backgrounds=self.backgrounds,
                                 foregrounds=self.foregrounds,
                                 bg_parameters=self.bg_parameters,
+                                original_names=self.original_names,
+                                original_index=self.original_index,
+                                original_average=self.original_average,
+                                raw_index=self.raw_index,
                                 )
 
         if isinstance(file, os.PathLike) or isinstance(file, str):
@@ -304,11 +321,13 @@ class ArrayAnalyse(object):
                 data = np.load(tar.extractfile(member))
 
         if base_data is None or data is None:
-            warnings.warn("The loaded save file was not valid.", RuntimeWarning)
-            return None
+            tar.close()
+            raise TypeError("The loaded save file was not valid.")
 
         if not cls._compare_version(config.allowed_load_version, base_data['version']):
-            raise TypeError(f'Save file from version {".".join(base_data["version"])} cannot be loaded')
+            version_str = "{}.{}.{}".format(*base_data["version"])
+            tar.close()
+            raise TypeError(f'A save file from version {version_str} cannot be loaded.')
         aa = cls(base_data['array_type'], silent=base_data['silent'])
         for name in aa.save_list_base:
             setattr(aa, name, base_data[name])
@@ -332,6 +351,11 @@ class ArrayAnalyse(object):
         self.bg_parameters = []
         self.meta_data = []
         self.exposure = []
+        self.original_average = []
+        self.original_index = []
+        self.original_names = []
+        self.raw_index = []
+        self.original_names = []
         self.is_finalized = False
         self.has_exposure = False
 
@@ -381,6 +405,8 @@ class ArrayAnalyse(object):
 
         if finalize and self.raw_images:
             self.finalize_collection()
+        else:
+            self.reset_collection()
 
     def finalize_collection(self):
         """
@@ -398,7 +424,10 @@ class ArrayAnalyse(object):
             return None
 
         self.bg_parameters = np.array(self.bg_parameters)
+        self.raw_index = np.array(self.raw_index)
+        self.original_average = np.array(self.original_average)
         self.exposure = np.array(self.exposure)
+
         if self.exposure.size == self.bg_parameters.size:
             order = np.argsort(self.exposure)
             self.exposure = self.exposure[order]
@@ -406,6 +435,8 @@ class ArrayAnalyse(object):
         else:
             order = np.argsort(self.bg_parameters)
             self.exposure = []
+
+        orginal_order = np.argsort(self.original_average)
         raw_images_array = np.zeros(shape=(self.raw_images[0].shape + (len(order),)),
                                     dtype=self.raw_images[0].dtype)
         backgrounds_array = np.zeros(shape=(self.backgrounds[0].shape + (len(order),)),
@@ -419,22 +450,99 @@ class ArrayAnalyse(object):
             backgrounds_array[:, :, n] = self.backgrounds[i]
             foregrounds_array[:, :, n] = self.foregrounds[i]
             source_images.append(self.source_images[i])
-            meta = self.meta_data[i]
+            meta.append(self.meta_data[i])
         self.raw_images = raw_images_array
         self.backgrounds = backgrounds_array
         self.foregrounds = foregrounds_array
         self.bg_parameters = self.bg_parameters[order]
+        self.raw_index = self.raw_index[order]
+        self.original_index = orginal_order
+        self.original_average = self.original_average[orginal_order]
         self.meta_data = meta
         self.source_images = source_images
         self.is_finalized = True
         if self.has_exposure:
             self.minimize_kappa()
 
-        if self.debug == 'plot': # pragma: no cover
+        if self.debug == 'plot':  # pragma: no cover
             self.figure_alignment()
             self.figure_contact_sheet()
 
-    def load_image(self, file, rotation=None, suffix=None, meta_data=None):
+    def modify_exposure(self, exposure_info, test=False):
+        """
+        Add or modify exposure information of a finalized collection.
+
+        Notes
+        -----
+        In case set exposure time changes the order
+
+        Parameters
+        ----------
+        exposure_info: Union[dict, list]
+            either list of exposure times with the same length and order as shown by *raw_names* or
+            dict describing start and step size of the exposure `{'start': 10, 'step': 30}`
+            unit in seconds
+        test: bool
+            if True no changes are made
+
+        Returns
+        -------
+        exposure: list
+            generated list of exposure in order of *raw_names*
+        reorder: bool
+            if the new exposure implies a reordering True is returned
+
+        """
+
+        if not self.is_finalized:
+            warnings.warn('Data collection needs to be finalized to amend exposure information.', RuntimeWarning)
+            return None
+        if isinstance(exposure_info, dict):
+            if 'start' in exposure_info and 'step' in exposure_info:
+                raw_exposure = exposure_info['start'] + np.array(range(len(self.original_average))) * exposure_info['step']
+                raw_exposure_lookup = {i: raw_exposure[n] for n, i in enumerate(self.original_index)}
+                exposure = [raw_exposure_lookup[i] for i in self.raw_index]
+            else:
+                warnings.warn('Exposure information needs the keys "start" and "step".', RuntimeWarning)
+                return None, None
+        else:
+            if len(exposure_info) == len(self.bg_parameters):
+                exposure = exposure_info
+            else:
+                warnings.warn('Exposure information has the wrong length.', RuntimeWarning)
+                return None, None
+
+        order = np.argsort(exposure)
+        reorder = not np.all(order[:-1] <= order[1:])
+        if test:
+            return exposure, reorder
+
+        self.exposure = exposure
+        if reorder:
+            raw_images_array = np.zeros_like(self.raw_images)
+            backgrounds_array = np.zeros_like(self.backgrounds)
+            foregrounds_array = np.zeros_like(self.foregrounds)
+            source_images = []
+            meta = []
+            for n, i in enumerate(order):
+                raw_images_array[:, :, n] = self.raw_images[:, :, i]
+                backgrounds_array[:, :, n] = self.backgrounds[:, :, i]
+                foregrounds_array[:, :, n] = self.foregrounds[:, :, i]
+                source_images.append(self.source_images[i])
+                meta.append(self.meta_data[i])
+            self.raw_images = raw_images_array
+            self.backgrounds = backgrounds_array
+            self.foregrounds = foregrounds_array
+            self.bg_parameters = self.bg_parameters[order]
+            self.raw_index = self.raw_index[order]
+            self.meta_data = meta
+            self.source_images = source_images
+
+        self.has_exposure = True
+        self.minimize_kappa()
+        return self.exposure, reorder
+
+    def load_image(self, file, rotation=None, filename=None, meta_data=None):
         """
         Load a single image file into the collection.
 
@@ -446,9 +554,10 @@ class ArrayAnalyse(object):
             if file is None result is directly shown
         rotation: int or float
             apply a rotation to the images
-        suffix: str
-            if a file-like object is submitted the suffix is needed for type identification (".tif", ".png", ...)
+        filename: str
+            if a file-like object is submitted the filename is needed for type identification (".tif", ".png", ...)
         meta_data: dict()
+
 
         """
 
@@ -461,7 +570,7 @@ class ArrayAnalyse(object):
             self.verbose_print(f'Load image: {file}')
             file = Path(file)
             source_image = ski_io.imread(file.absolute(), plugin='imageio')
-            suffix = file.suffix.lower()
+            filename = file.name
         elif isinstance(file, np.ndarray):
             source_image = file
         elif isinstance(file, (io.RawIOBase, io.BufferedIOBase)):
@@ -472,7 +581,7 @@ class ArrayAnalyse(object):
             return None
 
         if meta_data is None:
-            if suffix == '.tif':
+            if filename.lower().endswith('.tif'):
                 if file_system:
                     with tifffile.TiffFile(str(file.absolute())) as tif_data:
                         tags = [page.tags for page in tif_data.pages]
@@ -497,6 +606,8 @@ class ArrayAnalyse(object):
             source_image = rotate(source_image, rotation, resize=True)
 
         source_image = img_as_float(source_image)
+        self.original_average.append(np.average(source_image))
+        self.original_names.append(filename)
         raw_image = self.warp_image(source_image, rotation=rotation)
 
         if raw_image is not None:
@@ -529,6 +640,7 @@ class ArrayAnalyse(object):
             self.foregrounds.append(image)
             self.bg_parameters.append(self.background_histogram(raw_image))
             self.meta_data.append(meta_data)
+            self.raw_index.append(len(self.original_average) - 1)
             if meta_data:
                 if 'exposure_time' in meta_data:
                     self.exposure.append(meta_data['exposure_time'])

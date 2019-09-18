@@ -31,7 +31,7 @@ setup(name=config.app_name,
       keywords=['protein', 'microarrays', 'densitometric'],
       python_requires='~=3.6',
       classifiers=[
-          'Development Status :: 3 - Alpha',
+          'Development Status :: 4 - Beta',
 
           'Intended Audience :: Science/Research',
           'Topic :: Scientific/Engineering :: Bio-Informatics',
@@ -43,6 +43,7 @@ setup(name=config.app_name,
           'Operating System :: OS Independent',
           'Programming Language :: Python :: 3.6',
           'Programming Language :: Python :: 3.7',
+          'Programming Language :: Python :: 3.8',
           'Programming Language :: Python :: 3 :: Only'
       ],
       )
