@@ -140,7 +140,7 @@ class ArrayAnalyse(object):
                                "is_finalized",
                                "_kappa"]
         self.save_list_data = ['source_images', 'raw_images', 'backgrounds', 'foregrounds',
-                               'bg_parameters', 'exposure', 'original_index', 'original_average',
+                               'bg_parameters', 'original_index', 'original_average',
                                'original_average', 'raw_index']
 
         self.grid_position = np.zeros((sum(self.array_data['net_layout_x']), sum(self.array_data['net_layout_y']), 2))
@@ -607,7 +607,11 @@ class ArrayAnalyse(object):
 
         source_image = img_as_float(source_image)
         self.original_average.append(np.average(source_image))
-        self.original_names.append(filename)
+        if filename:
+            self.original_names.append(filename)
+        else:
+            warnings.warn("No filename was given. This limits some functions.", RuntimeWarning)
+
         raw_image = self.warp_image(source_image, rotation=rotation)
 
         if raw_image is not None:

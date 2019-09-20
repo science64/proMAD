@@ -4,9 +4,13 @@ Semiquantitative densitometric measurement of protein microarrays
 
 [![PyPi](https://img.shields.io/pypi/v/proMAD.svg?style=for-the-badge)](https://pypi.org/project/proMAD/)
 [![Status](https://img.shields.io/pypi/status/proMAD.svg?style=for-the-badge)](https://pypi.org/project/proMAD/)
+[![Github issues](https://img.shields.io/github/issues/theia-dev/proMAD.svg?style=for-the-badge)](https://github.com/theia-dev/proMAD/issues)
+[![License](https://img.shields.io/github/license/theia-dev/proMAD.svg?style=for-the-badge)](https://github.com/theia-dev/proMAD/blob/master/LICENSE.txt)
+
+[![Documentation](https://img.shields.io/readthedocs/promad.svg?style=for-the-badge)](https://promad.readthedocs.io)
 [![Coverage](https://img.shields.io/coveralls/github/theia-dev/proMAD?style=for-the-badge)](https://coveralls.io/github/theia-dev/proMAD)
 [![Build](https://img.shields.io/travis/theia-dev/proMAD.svg?style=for-the-badge)](https://travis-ci.org/theia-dev/proMAD)
-[![License](https://img.shields.io/github/license/theia-dev/proMAD.svg?style=for-the-badge)](https://github.com/theia-dev/proMAD/blob/master/LICENSE.txt)
+
 
 
 ## Setup
@@ -62,3 +66,6 @@ c.preview()
 c.save_images('test/cases/formatted_image_folder')  # save to folder (will be created if it does not exist)
 ```
 
+***
+
+The full source code can be accessed on [GitHub](https://github.com/theia-dev/proMAD) with the corresponding documentation hosted at [Read the docs](https://promad.readthedocs.io).
