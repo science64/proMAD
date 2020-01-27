@@ -64,7 +64,7 @@ Documentation of the `cut module`_.
 Report
 ----------
 
-Reports can be exported in a variety of file formats.
+Reports can be exported in a variety of file formats (xlsx, csv, tex, json).
 
 .. code-block:: python
 

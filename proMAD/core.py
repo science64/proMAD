@@ -1367,6 +1367,7 @@ class ArrayAnalyse(object):
         - json
         - csv (no metadata are stored in this format!)
         - excel
+        - latex
 
         Parameters
         ----------
