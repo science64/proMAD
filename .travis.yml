@@ -1,12 +1,13 @@
-dist: xenial   # required for Python >= 3.7
+dist: bionic   # ubuntu 18.04
 language: python
 cache: pip
 python:
   - "3.6"
   - "3.7"
+  - "3.8"
 matrix:
   include:
-    - python: "3.8-dev"
+    - python: "3.9-dev"
       addons:
         apt:
           packages:
@@ -17,7 +18,7 @@ matrix:
             - liblapack-dev
             - cython
   allow_failures:
-    - python: "3.8-dev"
+    - python: "3.9-dev"
   fast_finish: true
 
 install:
