@@ -17,8 +17,19 @@ Welcome to proMAD's documentation!
    usage
    documentation
 
+Citation
+--------
+If you use ``proMAD`` in your work please cite [Jaeschke-Eckert2020]_.
+
+.. [Jaeschke-Eckert2020] Jaeschke, A., Eckert, H. & Bray, L.J.
+    proMAD: semiquantitative densitometric measurement of protein microarrays.
+    *BMC Bioinformatics* **21**, 72 (2020). doi:`10.1186/s12859-020-3402-4`_
+
+.. _10.1186/s12859-020-3402-4: https://doi.org/10.1186/s12859-020-3402-4
+
+
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
