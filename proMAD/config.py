@@ -1,7 +1,7 @@
 from pathlib import Path
 
 app_name = 'proMAD'
-version_number = (0, 3, 1)
+version_number = (0, 3, 2)
 version = f'{version_number[0]}.{version_number[1]}.{version_number[2]}'
 app_author = 'Anna Jaeschke; Hagen Eckert'
 url = 'https://proMAD.dev'
