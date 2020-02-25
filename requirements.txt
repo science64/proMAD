@@ -1,5 +1,4 @@
 imageio
-ipython
 matplotlib
 numpy
 openpyxl

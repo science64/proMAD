@@ -308,7 +308,7 @@ class LoadCollection(TestARY022BCollection):
     def test_figure_alignment(self):
         save_mem = io.BytesIO()
         self.aa.figure_alignment(file=save_mem)
-        self.assertIn(hash_mem(save_mem),[
+        self.assertIn(hash_mem(save_mem), [
             '87d320e4b4ee5be2bc12f797661def7823217f5bcb6f9454637ccb23d2ec0f6d',
             '87027ff24e5dc57ee7ba21c10969a4b5873fb980c92a09fb657b690a790b5532'])
 

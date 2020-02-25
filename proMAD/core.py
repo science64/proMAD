@@ -1219,7 +1219,7 @@ class ArrayAnalyse(object):
             if max_size:
                 factor = max_size / np.max(image.shape)
                 if factor < 1:
-                    image = rescale(image, factor)
+                    image = rescale(image, factor, multichannel=True)
 
             image = img_as_ubyte(image)
             if isinstance(file, os.PathLike) or isinstance(file, str):
@@ -1281,7 +1281,7 @@ class ArrayAnalyse(object):
             if max_size:
                 factor = max_size / np.max(image.shape)
                 if factor < 1:
-                    image = rescale(image, factor)
+                    image = rescale(image, factor, multichannel=True)
 
             image = img_as_ubyte(image)
             if isinstance(file, os.PathLike) or isinstance(file, str):
@@ -1347,7 +1347,7 @@ class ArrayAnalyse(object):
             if max_size:
                 factor = max_size / np.max(image.shape)
                 if factor < 1:
-                    image = rescale(image, factor)
+                    image = rescale(image, factor, multichannel=True)
 
             image = img_as_ubyte(image)
             if isinstance(file, os.PathLike) or isinstance(file, str):
@@ -1377,6 +1377,9 @@ class ArrayAnalyse(object):
             evaluation strategy selection (see ArrayAnalyse.evaluate)
         report_type: str
             set the report type, if none try to guess depending on file name
+        additional_info: List[Dict]
+            list with dictionaries containing 'key' and 'value' key
+            ignored for CSV reports
         """
 
         if not self.is_finalized:
