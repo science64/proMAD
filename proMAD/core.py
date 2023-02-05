@@ -17,7 +17,7 @@ from skimage import img_as_float, img_as_ubyte
 from skimage import measure
 from skimage import transform
 from skimage.color import rgb2gray
-from skimage.external import tifffile
+import tifffile
 from skimage.morphology import reconstruction
 from skimage.transform import rotate, rescale
 from skimage.util import invert
